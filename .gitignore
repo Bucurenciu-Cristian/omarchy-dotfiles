@@ -1,0 +1,9 @@
+# Track .bak files for reference (user preference)
+# *.bak and *.bak.* are intentionally NOT ignored
+
+# Ignore temp files
+*~
+
+# Uncomment if you add sensitive data later
+# omarchy/.ssh/
+# omarchy/.gnupg/
