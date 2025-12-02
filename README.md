@@ -19,7 +19,7 @@ Personal Omarchy configuration managed with GNU Stow.
 sudo pacman -S stow
 
 # Clone and deploy
-git clone YOUR_REPO_URL ~/dotfiles
+git clone https://github.com/Bucurenciu-Cristian/omarchy-dotfiles.git ~/dotfiles
 cd ~/dotfiles
 stow omarchy
 ```
