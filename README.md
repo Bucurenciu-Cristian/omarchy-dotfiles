@@ -9,6 +9,8 @@ Personal Omarchy configuration managed with GNU Stow.
 - **Walker** (`~/.config/walker/`) - Application launcher
 - **Ghostty** (`~/.config/ghostty/`) - Terminal
 - **UWSM** (`~/.config/uwsm/`) - Session manager
+- **Tmux** (`~/.config/tmux/`) - Terminal multiplexer config with TPM plugins
+- **Tmux-Sessionizer** (`~/.local/bin/`) - Project session manager with fzf integration
 - **Shell** (`~/.bashrc`) - Bash config
 - **XCompose** (`~/.XCompose`) - Custom compose sequences
 
@@ -88,11 +90,30 @@ cd ~/dotfiles
 stow -nv omarchy  # Dry run with verbose output
 ```
 
+## Tmux Setup
+
+### Installing TPM (Tmux Plugin Manager)
+The tmux config uses TPM for plugins. Install it with:
+```bash
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+```
+
+Then inside tmux, press `Ctrl-a + I` (capital I) to install plugins.
+
+### Tmux-Sessionizer
+Quick project session switching with fzf:
+- **Keybinding in tmux**: `Ctrl-a + f`
+- **Shell command**: `tmux-sessionizer`
+- **Config**: `~/.config/tmux-sessionizer/tmux-sessionizer.conf`
+
+Configure search paths by editing the config file.
+
 ## System Info
 
 - Distribution: Omarchy (Arch Linux + Hyprland)
 - Dotfiles Manager: GNU Stow 2.4.1
 - Shell: Bash
+- Terminal Multiplexer: Tmux with TPM
 
 ---
 
