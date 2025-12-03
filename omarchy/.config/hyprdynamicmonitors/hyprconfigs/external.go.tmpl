@@ -1,0 +1,18 @@
+{{- $ext := index .MonitorsByTag "external" -}}
+# External: {{$ext.Description}}
+# Power: {{.PowerState}}
+
+monitor={{$ext.Name}},{{.res}}@{{if isOnAC}}{{.refresh_ac}}{{else}}{{.refresh_bat}}{{end}},0x0,{{.scale}}
+monitor=desc:California Institute of Technology 0x1319,disable
+
+# All workspaces on external
+workspace = 1,monitor:{{$ext.Name}},default:true
+workspace = 2,monitor:{{$ext.Name}}
+workspace = 3,monitor:{{$ext.Name}}
+workspace = 4,monitor:{{$ext.Name}}
+workspace = 5,monitor:{{$ext.Name}}
+workspace = 6,monitor:{{$ext.Name}}
+workspace = 7,monitor:{{$ext.Name}}
+workspace = 8,monitor:{{$ext.Name}}
+workspace = 9,monitor:{{$ext.Name}}
+workspace = 10,monitor:{{$ext.Name}}

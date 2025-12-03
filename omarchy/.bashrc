@@ -11,7 +11,7 @@ source ~/.local/share/omarchy/default/bash/rc
 # alias p='python'
 
 # Refresh monitor detection (useful when switching external monitors)
-alias monitors='hyprdynamicmonitors run --run-once'
+alias monitors='kill -SIGHUP $(pidof hyprdynamicmonitors) 2>/dev/null || hyprdynamicmonitors run --run-once'
 
 . "$HOME/.local/share/../bin/env"
 . "$HOME/.cargo/env"

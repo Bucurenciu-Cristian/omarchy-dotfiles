@@ -2,57 +2,60 @@
 
 Automatic monitor profile switching for Hyprland using [hyprdynamicmonitors](https://hyprdynamicmonitors.filipmikina.com/).
 
-## Monitors
+## Architecture
 
-| Tag | Monitor | Resolution | Notes |
-|-----|---------|------------|-------|
-| laptop | California Institute of Technology 0x1319 | 2880x1920 | Framework 13 built-in, scale 2 |
-| iiyama | Iiyama North America PL3481WQ | 3440x1440@180Hz | Primary home monitor, scale 1.25 |
-| asus | ASUSTek COMPUTER INC VG34VQEL1A | 3440x1440@100Hz | Secondary ultrawide |
-| lg | LG Electronics LG ULTRAWIDE | 2560x1080 | Portrait mode (270 rotation) |
-| arzopa | ARZOPA | 1920x1080 | Portable monitor |
-| samsung | Samsung | 1920x1080@120Hz | TV |
+```
+~/.config/hyprdynamicmonitors/
+├── config.toml          # Profile definitions with per-profile variables
+└── hyprconfigs/
+    ├── laptop.conf      # Static fallback (no external connected)
+    └── external.go.tmpl # Single template for all external monitors
+```
 
-## Profiles (Priority Order)
+## Profiles
 
-Profiles are alphabetically prefixed for priority (first match wins):
+| Profile | Match Regex | Resolution | AC Hz | Battery Hz | Scale |
+|---------|-------------|------------|-------|------------|-------|
+| iiyama | PL3481WQ | 3440x1440 | 180 | 60 | 1.25 |
+| asus | VG34VQ | 3440x1440 | 100 | 60 | 1.25 |
+| arzopa | ARZOPA | 1920x1080 | 60 | 60 | 1.0 |
+| samsung | Samsung | 1920x1080 | 120 | 60 | 1.0 |
+| laptop | (fallback) | 2880x1920 | 60 | 60 | 2.0 |
 
-1. **a-home-iiyama-primary** - Laptop + LG + Iiyama connected, only Iiyama active
-2. **b-triple** - LG + Iiyama + ASUS triple monitor setup
-3. **c-dual-iiyama** - Laptop + Iiyama, only Iiyama active
-4. **d-dual-asus** - Laptop + ASUS, only ASUS active
-5. **e-dual-lg** - Laptop + LG portrait layout
-6. **f-iiyama** - Iiyama only
-7. **g-asus** - ASUS only
-8. **h-lg** - LG portrait only
-9. **i-arzopa** - Laptop + ARZOPA portable
-10. **j-samsung** - Samsung TV only
-11. **z-laptop** - Laptop only (fallback)
+## Behavior
 
-## Power-Aware Refresh Rates
+- **External connected** → Profile matched by regex, laptop disabled, all workspaces on external
+- **No external** → Fallback to laptop profile
+- **Power state change** → Refresh rate adjusts (AC = high, battery = 60Hz)
 
-Templates use `{{if isOnAC}}` conditionals for power-aware refresh rates:
-- On AC: Full refresh rate (180Hz for Iiyama, 100Hz for ASUS, etc.)
-- On battery: 60Hz to save power
-
-## Running as Systemd Service
+## Commands
 
 ```bash
-# Enable services
-systemctl --user enable --now hyprdynamicmonitors.service
-systemctl --user enable hyprdynamicmonitors-prepare.service
+# Force re-detection (when hot-swapping monitors)
+monitors
 
-# Check status
+# Service management
 systemctl --user status hyprdynamicmonitors
-
-# View logs
+systemctl --user restart hyprdynamicmonitors
 journalctl --user -u hyprdynamicmonitors -f
 ```
 
-## Manual Refresh
+## Adding a New Monitor
 
-When switching between external monitors, the daemon may not detect the new monitor if the current profile has it disabled. Use the alias to force detection:
-
-```bash
-monitors  # alias for: hyprdynamicmonitors run --run-once
+1. Get the description: `hyprctl monitors`
+2. Add profile to `config.toml`:
+```toml
+[profiles.mymonitor]
+config_file = "hyprconfigs/external.go.tmpl"
+config_file_type = "template"
+[profiles.mymonitor.static_template_values]
+res = "1920x1080"
+refresh_ac = "144"
+refresh_bat = "60"
+scale = "1.0"
+[[profiles.mymonitor.conditions.required_monitors]]
+description = "PARTIAL_MATCH"
+match_description_using_regex = true
+monitor_tag = "external"
 ```
+3. Restart service: `systemctl --user restart hyprdynamicmonitors`
