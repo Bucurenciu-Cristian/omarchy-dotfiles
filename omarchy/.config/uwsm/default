@@ -2,7 +2,7 @@
 
 # Install other terminals via Install > Terminal
 export TERMINAL=xdg-terminal-exec
-
+export BROWSER=brave
 # Use code for VSCode
 export EDITOR=cursor
 

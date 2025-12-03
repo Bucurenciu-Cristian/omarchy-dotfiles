@@ -1,0 +1,15 @@
+# Dual Monitor Layout - Laptop + LG Portrait
+# Layout: LG Portrait (left) | Laptop (right)
+#
+# LG Portrait at 0,0 - 1080px wide when rotated 270 degrees
+# Laptop at 1080,0 - to the right of LG
+
+# LG Portrait (left) - 270 degree rotation
+monitor=desc:LG Electronics LG ULTRAWIDE 0x00080DF4,2560x1080@60,0x0,1,transform,3,vrr,0
+
+# Laptop (right)
+monitor=desc:California Institute of Technology 0x1319,2880x1920@60,1080x0,1.5,transform,0,vrr,0
+
+# Disable other monitors if connected
+monitor=desc:Iiyama North America PL3481WQ 1242542701807,disable
+monitor=desc:ASUSTek COMPUTER INC VG34VQEL1A NBLMDW006540,disable

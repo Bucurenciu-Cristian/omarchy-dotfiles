@@ -4,6 +4,9 @@
 # Ignore temp files
 *~
 
+# Ignore numbered backup files (automated backups)
+*.bak.[0-9]*
+
 # Uncomment if you add sensitive data later
 # omarchy/.ssh/
 # omarchy/.gnupg/

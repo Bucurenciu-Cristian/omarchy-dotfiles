@@ -1,0 +1,179 @@
+[general]
+destination = "$HOME/.config/hypr/monitors.conf"
+
+[power_events]
+[power_events.dbus_query_object]
+path = "/org/freedesktop/UPower/devices/line_power_ADP1"
+
+[[power_events.dbus_signal_match_rules]]
+object_path = "/org/freedesktop/UPower/devices/line_power_ADP1"
+
+
+# =============================================================================
+# HOME SETUP - All home monitors present (including disabled ones)
+# This profile handles the case when LG is connected but we want Iiyama active
+# =============================================================================
+[profiles.a-home-iiyama-primary]
+config_file = "hyprconfigs/home-iiyama.go.tmpl"
+config_file_type = "template"
+
+[profiles.a-home-iiyama-primary.conditions]
+[[profiles.a-home-iiyama-primary.conditions.required_monitors]]
+description = "California Institute of Technology 0x1319"
+monitor_tag = "laptop"
+
+[[profiles.a-home-iiyama-primary.conditions.required_monitors]]
+description = "LG Electronics LG ULTRAWIDE 0x00080DF4"
+monitor_tag = "lg"
+
+[[profiles.a-home-iiyama-primary.conditions.required_monitors]]
+description = "Iiyama North America PL3481WQ 1242542701807"
+monitor_tag = "iiyama"
+
+
+# =============================================================================
+# TRIPLE MONITOR SETUP (Full Home Setup)
+# Layout: LG Portrait (left) | Iiyama (top-right) | ASUS (bottom-right)
+# =============================================================================
+[profiles.b-triple]
+config_file = "hyprconfigs/triple.go.tmpl"
+config_file_type = "template"
+
+[profiles.b-triple.conditions]
+[[profiles.b-triple.conditions.required_monitors]]
+description = "LG Electronics LG ULTRAWIDE 0x00080DF4"
+monitor_tag = "lg"
+
+[[profiles.b-triple.conditions.required_monitors]]
+description = "Iiyama North America PL3481WQ 1242542701807"
+monitor_tag = "iiyama"
+
+[[profiles.b-triple.conditions.required_monitors]]
+description = "ASUSTek COMPUTER INC VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
+
+
+# =============================================================================
+# DUAL MONITOR SETUP (Laptop + Iiyama - no LG connected)
+# =============================================================================
+[profiles.c-dual-iiyama]
+config_file = "hyprconfigs/dual-iiyama.go.tmpl"
+config_file_type = "template"
+
+[profiles.c-dual-iiyama.conditions]
+[[profiles.c-dual-iiyama.conditions.required_monitors]]
+description = "California Institute of Technology 0x1319"
+monitor_tag = "laptop"
+
+[[profiles.c-dual-iiyama.conditions.required_monitors]]
+description = "Iiyama North America PL3481WQ 1242542701807"
+monitor_tag = "iiyama"
+
+
+# =============================================================================
+# DUAL MONITOR SETUP (Laptop + ASUS)
+# =============================================================================
+[profiles.d-dual-asus]
+config_file = "hyprconfigs/dual-asus.go.tmpl"
+config_file_type = "template"
+
+[profiles.d-dual-asus.conditions]
+[[profiles.d-dual-asus.conditions.required_monitors]]
+description = "California Institute of Technology 0x1319"
+monitor_tag = "laptop"
+
+[[profiles.d-dual-asus.conditions.required_monitors]]
+description = "ASUSTek COMPUTER INC VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
+
+
+# =============================================================================
+# DUAL MONITOR SETUP (Laptop + LG)
+# =============================================================================
+[profiles.e-dual-lg]
+config_file = "hyprconfigs/dual-lg.go.tmpl"
+config_file_type = "template"
+
+[profiles.e-dual-lg.conditions]
+[[profiles.e-dual-lg.conditions.required_monitors]]
+description = "California Institute of Technology 0x1319"
+monitor_tag = "laptop"
+
+[[profiles.e-dual-lg.conditions.required_monitors]]
+description = "LG Electronics LG ULTRAWIDE 0x00080DF4"
+monitor_tag = "lg"
+
+
+# =============================================================================
+# SINGLE MONITOR PROFILES
+# =============================================================================
+
+# Iiyama Only
+[profiles.f-iiyama]
+config_file = "hyprconfigs/iiyama.go.tmpl"
+config_file_type = "template"
+
+[profiles.f-iiyama.conditions]
+[[profiles.f-iiyama.conditions.required_monitors]]
+description = "Iiyama North America PL3481WQ 1242542701807"
+monitor_tag = "iiyama"
+
+
+# ASUS Only
+[profiles.g-asus]
+config_file = "hyprconfigs/asus.go.tmpl"
+config_file_type = "template"
+
+[profiles.g-asus.conditions]
+[[profiles.g-asus.conditions.required_monitors]]
+description = "ASUSTek COMPUTER INC VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
+
+
+# LG Only (Portrait)
+[profiles.h-lg]
+config_file = "hyprconfigs/lg.go.tmpl"
+config_file_type = "template"
+
+[profiles.h-lg.conditions]
+[[profiles.h-lg.conditions.required_monitors]]
+description = "LG Electronics LG ULTRAWIDE 0x00080DF4"
+monitor_tag = "lg"
+
+
+# ARZOPA Portable
+[profiles.i-arzopa]
+config_file = "hyprconfigs/arzopa.go.tmpl"
+config_file_type = "template"
+
+[profiles.i-arzopa.conditions]
+[[profiles.i-arzopa.conditions.required_monitors]]
+description = "ARZOPA"
+match_description_using_regex = true
+monitor_tag = "arzopa"
+
+
+# Samsung TV
+[profiles.j-samsung]
+config_file = "hyprconfigs/samsung.go.tmpl"
+config_file_type = "template"
+
+[profiles.j-samsung.conditions]
+[[profiles.j-samsung.conditions.required_monitors]]
+description = "Samsung"
+match_description_using_regex = true
+monitor_tag = "samsung"
+
+
+# Laptop Only (Fallback)
+[profiles.z-laptop]
+config_file = "hyprconfigs/laptop.go.tmpl"
+config_file_type = "template"
+
+[profiles.z-laptop.conditions]
+[[profiles.z-laptop.conditions.required_monitors]]
+description = "California Institute of Technology 0x1319"
+monitor_tag = "laptop"

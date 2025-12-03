@@ -10,6 +10,9 @@ source ~/.local/share/omarchy/default/bash/rc
 # Make an alias for invoking commands you use constantly
 # alias p='python'
 
+# Refresh monitor detection (useful when switching external monitors)
+alias monitors='hyprdynamicmonitors run --run-once'
+
 . "$HOME/.local/share/../bin/env"
 . "$HOME/.cargo/env"
 export PATH=$HOME/.local/bin:$PATH
