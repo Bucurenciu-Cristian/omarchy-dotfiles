@@ -16,3 +16,5 @@ alias monitors='kill -SIGHUP $(pidof hyprdynamicmonitors) 2>/dev/null || hyprdyn
 . "$HOME/.local/share/../bin/env"
 . "$HOME/.cargo/env"
 export PATH=$HOME/.local/bin:$PATH
+
+alias superset='/home/kicky/dev/superset/apps/desktop/release/superset-0.0.3-x86_64.AppImage'
