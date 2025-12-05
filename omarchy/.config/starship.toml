@@ -30,3 +30,6 @@ stashed    = ""
 staged     = ""
 renamed    = ""
 deleted    = ""
+
+[bun]
+format = 'via [🍔 $version](bold green) '
