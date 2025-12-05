@@ -222,13 +222,16 @@ fi
 
 # utility function to find directories
 find_dirs() {
-    # list TMUX sessions
+    # list TMUX sessions first (sorted)
     if [[ -n "${TMUX}" ]]; then
         current_session=$(tmux display-message -p '#S')
-        tmux list-sessions -F "[TMUX] #{session_name}" 2>/dev/null | grep -vFx "[TMUX] $current_session"
+        tmux list-sessions -F "[TMUX] #{session_name}" 2>/dev/null | grep -vFx "[TMUX] $current_session" | sort
     else
-        tmux list-sessions -F "[TMUX] #{session_name}" 2>/dev/null
+        tmux list-sessions -F "[TMUX] #{session_name}" 2>/dev/null | sort
     fi
+
+    # ~/dev folders first (sorted)
+    [[ -d ~/dev ]] && find ~/dev -mindepth 1 -maxdepth 2 -path '*/.git' -prune -o -type d -print | sort
 
     # note: TS_SEARCH_PATHS is an array of paths to search for directories
     # if the path ends with :number, it will search for directories with a max depth of number ;)
@@ -242,7 +245,10 @@ find_dirs() {
             path="$entry"
         fi
 
-        [[ -d "$path" ]] && find "$path" -mindepth 1 -maxdepth "${depth:-${TS_MAX_DEPTH:-1}}" -path '*/.git' -prune -o -type d -print
+        # Skip ~/dev since we already listed it first
+        [[ "$path" == ~/dev || "$path" == "$HOME/dev" ]] && continue
+
+        [[ -d "$path" ]] && find "$path" -mindepth 1 -maxdepth "${depth:-${TS_MAX_DEPTH:-1}}" -path '*/.git' -prune -o -type d -print | sort
     done
 }
 
@@ -379,7 +385,7 @@ if [[ ! -z $session_cmd ]]; then
 elif [[ ! -z $user_selected ]]; then
     selected="$user_selected"
 else
-    selected=$(new_find_dirs | fzf)
+    selected=$(find_dirs | fzf)
 fi
 
 if [[ -z $selected ]]; then
