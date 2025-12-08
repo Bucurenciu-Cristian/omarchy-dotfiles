@@ -1,0 +1,14 @@
+#!/bin/bash
+STATE_DIR="$HOME/.local/state/hyprland"
+VISIBLE_FILE="$STATE_DIR/project-indicator-visible"
+
+# Check if indicator should be visible
+visible=$(cat "$VISIBLE_FILE" 2>/dev/null || echo "0")
+
+if [[ "$visible" != "1" ]]; then
+    echo '{"text": "", "tooltip": "", "class": "hidden"}'
+    exit 0
+fi
+
+project=$(cat "$STATE_DIR/current-project" 2>/dev/null || echo "none")
+echo "{\"text\": \"$project\", \"tooltip\": \"Project: $project\", \"class\": \"$project\"}"

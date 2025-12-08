@@ -81,3 +81,8 @@ tooltip {
 #custom-screenrecording-indicator.active {
   color: #a55555;
 }
+
+#custom-project {
+  margin-right: 8px;
+  opacity: 0.7;
+}

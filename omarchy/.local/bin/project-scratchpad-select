@@ -1,0 +1,23 @@
+#!/bin/bash
+# Project Scratchpad Selection (for submap use)
+# Called with a single number argument
+
+set -euo pipefail
+
+STATE_DIR="$HOME/.local/state/hyprland"
+STATE_FILE="$STATE_DIR/current-project"
+CONFIG_FILE="$HOME/.config/hypr/projects.conf"
+
+mkdir -p "$STATE_DIR"
+
+idx="$1"
+project=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
+
+if [[ -z "$project" ]]; then
+    notify-send "Project Scratchpad" "No project at index $idx"
+    exit 1
+fi
+
+echo "$project" > "$STATE_FILE"
+echo "1" > "$STATE_DIR/project-indicator-visible"
+notify-send "Project Mode" "Switched to: $project"

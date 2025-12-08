@@ -5,7 +5,7 @@
   "spacing": 3,
   "height": 26,
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["clock", "custom/update", "custom/screenrecording-indicator"],
+  "modules-center": ["custom/project", "clock", "custom/update", "custom/screenrecording-indicator"],
   "modules-right": [
     "group/tray-expander",
     "bluetooth",
@@ -48,6 +48,15 @@
     "on-click": "omarchy-menu",
     "on-click-right": "xdg-terminal-exec",
     "tooltip-format": "Omarchy Menu\n\nSuper + Alt + Space"
+  },
+  "custom/project": {
+    "format": "{}",
+    "exec": "project-indicator",
+    "return-type": "json",
+    "interval": 1,
+    "on-click": "project-scratchpad toggle",
+    "on-click-right": "echo 0 > ~/.local/state/hyprland/project-indicator-visible",
+    "tooltip": true
   },
   "custom/update": {
     "format": "",
