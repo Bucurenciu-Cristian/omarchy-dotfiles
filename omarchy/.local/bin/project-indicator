@@ -11,4 +11,12 @@ if [[ "$visible" != "1" ]]; then
 fi
 
 project=$(cat "$STATE_DIR/current-project" 2>/dev/null || echo "none")
-echo "{\"text\": \"$project\", \"tooltip\": \"Project: $project\", \"class\": \"$project\"}"
+
+# Count windows in this project's scratchpad
+count=$(hyprctl clients -j | jq "[.[] | select(.workspace.name == \"special:project:$project\")] | length")
+
+if [[ "$count" -gt 0 ]]; then
+    echo "{\"text\": \"$project ($count)\", \"tooltip\": \"Project: $project - $count windows\", \"class\": \"$project\"}"
+else
+    echo "{\"text\": \"$project\", \"tooltip\": \"Project: $project\", \"class\": \"$project\"}"
+fi

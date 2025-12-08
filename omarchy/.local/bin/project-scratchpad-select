@@ -11,13 +11,36 @@ CONFIG_FILE="$HOME/.config/hypr/projects.conf"
 mkdir -p "$STATE_DIR"
 
 idx="$1"
-project=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
 
-if [[ -z "$project" ]]; then
+# Get the full line (may include autostart commands after colon)
+line=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
+
+if [[ -z "$line" ]]; then
     notify-send "Project Scratchpad" "No project at index $idx"
     exit 1
 fi
 
+# Extract project name (before colon) and autostart commands (after colon)
+project=$(echo "$line" | cut -d: -f1)
+autostart=$(echo "$line" | grep ':' | cut -d: -f2- || true)
+
+# Save current project
 echo "$project" > "$STATE_FILE"
 echo "1" > "$STATE_DIR/project-indicator-visible"
 notify-send "Project Mode" "Switched to: $project"
+
+# Run autostart commands if defined (only if not already running)
+if [[ -n "$autostart" ]]; then
+    IFS=';' read -ra cmds <<< "$autostart"
+    for cmd in "${cmds[@]}"; do
+        # Trim whitespace
+        cmd=$(echo "$cmd" | xargs)
+        if [[ -n "$cmd" ]]; then
+            # Extract app name (first word) to check if running
+            app=$(echo "$cmd" | awk '{print $1}')
+            if ! pgrep -f "$app" > /dev/null 2>&1; then
+                uwsm-app -- $cmd &
+            fi
+        fi
+    done
+fi

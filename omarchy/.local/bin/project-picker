@@ -1,0 +1,18 @@
+#!/bin/bash
+# Project Picker - fuzzy search projects with walker
+
+CONFIG_FILE="$HOME/.config/hypr/projects.conf"
+
+# Extract just project names (before any colon for autostart)
+projects=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d: -f1)
+
+# Use omarchy-launch-walker (handles service properly)
+selected=$(echo "$projects" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 200 -p "Project…" 2>/dev/null)
+
+if [[ -n "$selected" ]]; then
+    # Find index of selected project
+    idx=$(echo "$projects" | grep -n "^${selected}$" | cut -d: -f1)
+    if [[ -n "$idx" ]]; then
+        project-scratchpad-select "$idx"
+    fi
+fi

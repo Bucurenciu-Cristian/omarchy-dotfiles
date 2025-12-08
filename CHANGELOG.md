@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-12-08
+
+- **Project Scratchpads** - Window management system for multi-project workflows
+  - Project-specific special workspaces as "drawers" for stashing windows
+  - `Super B` toggle scratchpad, `Super Alt B` send window, `Super P` fuzzy picker
+  - Waybar indicator with window count, auto-hide/show on project switch
+  - Per-project autostart commands in `projects.conf`
+  - Walker integration for fuzzy project selection
+
 ## 2025-12-03
 
 - **hyprdynamicmonitors v2** - Simplified to 2 files: single `external.go.tmpl` template + `laptop.conf` fallback

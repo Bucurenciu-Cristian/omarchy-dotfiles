@@ -16,27 +16,28 @@ get_current_project() {
     if [[ -f "$STATE_FILE" ]]; then
         cat "$STATE_FILE"
     else
-        # Default to first project in config
-        grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | head -1
+        # Default to first project in config (extract name before colon)
+        grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | head -1 | cut -d: -f1
     fi
 }
 
-# List all projects from config
+# List all projects from config (just names, not autostart commands)
 list_projects() {
-    grep -v '^#' "$CONFIG_FILE" | grep -v '^$'
+    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d: -f1
 }
 
-# Set current project by index (1-based)
+# Set current project by index (1-based) - use project-scratchpad-select for full functionality
 set_project_by_index() {
     local idx="$1"
-    local project
-    project=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
+    local line
+    line=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
 
-    if [[ -z "$project" ]]; then
+    if [[ -z "$line" ]]; then
         notify-send "Project Scratchpad" "Invalid project index: $idx"
         exit 1
     fi
 
+    local project=$(echo "$line" | cut -d: -f1)
     echo "$project" > "$STATE_FILE"
     notify-send "Project Mode" "Switched to: $project"
 }
