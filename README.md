@@ -4,10 +4,14 @@ Personal Omarchy configuration managed with GNU Stow.
 
 ## Contents
 
-- **Hyprland** (`~/.config/hypr/`) - Window manager configs
-- **Waybar** (`~/.config/waybar/`) - Status bar
+- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads
+- **Waybar** (`~/.config/waybar/`) - Status bar with project indicator
 - **Walker** (`~/.config/walker/`) - Application launcher
 - **Ghostty** (`~/.config/ghostty/`) - Terminal
+- **Neovim** (`~/.config/nvim/`) - LazyVim config with Omarchy theme hotreload
+- **Zed** (`~/.config/zed/`) - Editor settings with MCP Docker
+- **ostt** (`~/.config/ostt/`) - Speech-to-text config (Deepgram)
+- **mise** (`~/.config/mise/`) - Dev tool versions (bun, node, python)
 - **UWSM** (`~/.config/uwsm/`) - Session manager
 - **Tmux** (`~/.config/tmux/`) - Terminal multiplexer config with TPM plugins
 - **Tmux-Sessionizer** (`~/.local/bin/`) - Project session manager with fzf integration
@@ -117,4 +121,4 @@ Configure search paths by editing the config file.
 
 ---
 
-Last Updated: 2025-12-02
+Last Updated: 2025-12-10

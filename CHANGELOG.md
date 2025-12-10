@@ -1,5 +1,19 @@
 # Changelog
 
+## 2025-12-10
+
+- **Neovim** - Full LazyVim configuration with custom plugins
+  - Theme hotreload for Omarchy theme switching
+  - Animated scrolling disabled, transparency support
+  - Custom keymaps and autocmds
+- **ostt** - Speech-to-text integration
+  - Deepgram-powered transcription config
+  - Hyprland floating window launcher (`Super R`)
+  - Alacritty float styling for minimal overlay
+- **Zed** - Editor settings with MCP Docker integration
+- **mise** - Development tool version management (bun, node, python)
+- **Hyprland updates** - ostt keybind, project scratchpad logging
+
 ## 2025-12-08
 
 - **Project Scratchpads** - Window management system for multi-project workflows
