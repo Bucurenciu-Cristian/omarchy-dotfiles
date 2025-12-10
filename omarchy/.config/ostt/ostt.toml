@@ -1,0 +1,84 @@
+# ostt Configuration
+#
+# This file is automatically placed in ~/.config/ostt/ostt.toml on first setup.
+# You can edit this file to customize ostt behavior.
+
+[audio]
+# Audio device to use.
+# Options:
+#   "default"          - Use system default device
+#   "0", "1", "2", ... - Use device by index (see ostt list-devices)
+#   "device name"      - Use device by name (see ostt list-devices)
+#
+# Examples:
+#   device = "0"           # Use first device
+#   device = "AMS-24"      # Use device named "AMS-24"
+#   device = "pipewire"    # Use device named "pipewire"
+#
+# To see available devices, run: ostt list-devices
+device = "default"
+
+# Sample rate in Hz (16000 recommended for speech recognition)
+sample_rate = 16000
+
+# Peak volume threshold for red indicator (0-100, percentage of reference level)
+# Default 90 means warn at 90% of reference_level_db (10% headroom before clipping)
+peak_volume_threshold = 90
+
+# Reference level in dBFS for 100% meter display
+# Set this to your audio card's maximum input level for accurate metering
+# Typical values:
+#   -6 dBFS: Very hot recording (near clipping)
+#  -12 dBFS: Hot recording (professional standard)
+#  -18 dBFS: Moderate recording level
+#  -20 dBFS: Conservative level (typical audio card max)
+reference_level_db = -20
+
+# Output audio format (uses ffmpeg for conversion)
+# Format: "codec [ffmpeg_options]"
+# All audio is saved mono with ffmpeg handling resampling/compression
+#
+# Recommended formats:
+#   "mp3 -ab 16k -ar 12000" - MP3 16kbps 12kHz (Whisper API optimal, ~1.8 MB/hour)
+#   "libopus -ab 32k -ar 16000" - OGG Opus 32kbps 16kHz (~3.6 MB/hour)
+#   "aac -ab 32k -ar 16000" - AAC 32kbps 16kHz (~3.6 MB/hour)
+#   "flac -ar 16000" - FLAC 16kHz lossless (~20 MB/hour)
+#   "pcm_s16le" - WAV PCM original rate (largest, no compression)
+#
+# Add more formats as needed - ffmpeg handles the rest!
+output_format = "mp3 -ab 16k -ar 12000"
+
+# Provider-specific settings
+# Each provider can have its own configuration section
+
+[providers.deepgram]
+# Include filler words in transcript (uh, um, etc.)
+filler_words = false
+
+# Convert spoken measurements to their abbreviations
+measurements = false
+
+# Convert numbers from written format to numerical format
+numerals = false
+
+# Split audio into paragraphs to improve transcript readability
+paragraphs = false
+
+# Apply profanity filter to transcript
+profanity_filter = false
+
+# Add punctuation and capitalization to transcript
+punctuate = true
+
+# Apply smart formatting to transcript output for improved readability
+smart_format = false
+
+# Segment speech into meaningful semantic units
+utterances = false
+
+# Seconds to wait before detecting pause between words (range: 0.5-3.0)
+utt_split = 0.8
+
+# Opt out from Deepgram Model Improvement Program
+# WARNING: This may impact pricing. See docs at https://dpgr.am/deepgram-mip
+mip_opt_out = false
