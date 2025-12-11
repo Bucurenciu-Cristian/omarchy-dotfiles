@@ -7,10 +7,9 @@ set -euo pipefail
 STATE_DIR="$HOME/.local/state/hyprland"
 STATE_FILE="$STATE_DIR/current-project"
 CONFIG_FILE="$HOME/.config/hypr/projects.conf"
-LOG_DIR="$STATE_DIR/project-logs"
 
-# Ensure directories exist
-mkdir -p "$STATE_DIR" "$LOG_DIR"
+# Ensure state directory exists
+mkdir -p "$STATE_DIR"
 
 # Get current project (default to first project if not set)
 get_current_project() {
@@ -66,31 +65,7 @@ send_to_scratchpad() {
         exit 1
     fi
 
-    # Log window info before moving
-    local window_info=$(hyprctl activewindow -j)
-    local title=$(echo "$window_info" | jq -r '.title')
-    local class=$(echo "$window_info" | jq -r '.class')
-    echo "$(date -Iseconds) | $class | $title" >> "$LOG_DIR/$project.log"
-
     hyprctl dispatch movetoworkspacesilent "special:project:$project"
-}
-
-# View project logs
-view_logs() {
-    local project="${1:-$(get_current_project)}"
-    local follow="${2:-}"
-    local log_file="$LOG_DIR/$project.log"
-
-    if [[ ! -f "$log_file" ]]; then
-        echo "No logs for project: $project"
-        exit 0
-    fi
-
-    if [[ "$follow" == "-f" ]]; then
-        tail -f "$log_file"
-    else
-        cat "$log_file"
-    fi
 }
 
 # Show current project
@@ -120,11 +95,8 @@ case "${1:-toggle}" in
     list)
         list_projects
         ;;
-    logs)
-        view_logs "${2:-}" "${3:-}"
-        ;;
     *)
-        echo "Usage: project-scratchpad [toggle|send|set <index>|current|show|list|logs [project] [-f]]"
+        echo "Usage: project-scratchpad [toggle|send|set <index>|current|show|list]"
         exit 1
         ;;
 esac
