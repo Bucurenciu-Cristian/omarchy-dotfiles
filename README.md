@@ -4,7 +4,7 @@ Personal Omarchy configuration managed with GNU Stow.
 
 ## Contents
 
-- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads
+- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads, workspace assignments
 - **Waybar** (`~/.config/waybar/`) - Status bar with project indicator
 - **Walker** (`~/.config/walker/`) - Application launcher
 - **Ghostty** (`~/.config/ghostty/`) - Terminal
@@ -112,6 +112,21 @@ Quick project session switching with fzf:
 
 Configure search paths by editing the config file.
 
+## Workspace Layout
+
+Apps automatically open on their assigned workspace:
+
+| Workspace | Purpose | Apps |
+|-----------|---------|------|
+| 1 | Browsers | Brave, Firefox, Chromium |
+| 2 | AI | Claude, Perplexity |
+| 3 | Terminals | Ghostty, TUIs (btop, lazydocker, hyprmon) |
+| 4 | Editors | Cursor, Zed |
+| 5 | Social | WhatsApp, Teams, Telegram |
+| 6 | Productivity | Google Calendar, Notion |
+
+Configured via `windowrulev2` in `~/.config/hypr/custom.conf`.
+
 ## System Info
 
 - Distribution: Omarchy (Arch Linux + Hyprland)
@@ -121,4 +136,4 @@ Configure search paths by editing the config file.
 
 ---
 
-Last Updated: 2025-12-10
+Last Updated: 2025-12-11

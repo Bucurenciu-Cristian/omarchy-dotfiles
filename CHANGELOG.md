@@ -1,5 +1,18 @@
 # Changelog
 
+## 2025-12-11
+
+- **Workspace Assignments** - Automatic window-to-workspace routing
+  - Workspace 1: Browsers (Brave, Firefox, Chromium)
+  - Workspace 2: AI (Claude PWA, Perplexity PWA)
+  - Workspace 3: Terminals & TUIs (Ghostty, btop, lazydocker, hyprmon)
+  - Workspace 4: Editors (Cursor, Zed)
+  - Workspace 5: Social (WhatsApp, Teams, Telegram)
+  - Workspace 6: Productivity (Google Calendar, Notion)
+- **Hyprland cleanup** - hyprfocus plugin, window rounding, 16:9 aspect ratio
+- **Waybar** - Reduced from 10 to 5 persistent workspaces
+- **project-scratchpad** - Removed logging feature
+
 ## 2025-12-10
 
 - **Neovim** - Full LazyVim configuration with custom plugins
