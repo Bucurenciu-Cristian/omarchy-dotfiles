@@ -19,8 +19,17 @@ if [ -e "$OSTT_BIN" ]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ALACRITTY_CONFIG="${HOME}/.config/ostt/alacritty-float.toml"
 STATE_FILE="/tmp/ostt_active.pid"
+
+# Detect terminal emulator
+if command -v ghostty &>/dev/null; then
+    TERMINAL="ghostty"
+elif command -v alacritty &>/dev/null; then
+    TERMINAL="alacritty"
+else
+    hyprctl notify -1 2 5000 "rgb(ff0000)" "ostt: No supported terminal (ghostty/alacritty)"
+    exit 1
+fi
 
 # --- Helpers -----------------------------------------------------------------
 register_pid() {
@@ -56,9 +65,12 @@ if [ -f "$STATE_FILE" ]; then
     fi
 fi
 
-# ostt not running → spawn new window with Alacritty config
-hyprctl dispatch exec \
-  "[float] alacritty --config-file \"$ALACRITTY_CONFIG\" --title ostt -e \"$OSTT_BIN\""
+# ostt not running → spawn new window
+if [ "$TERMINAL" = "ghostty" ]; then
+    hyprctl dispatch exec "[float] ghostty --title=ostt -e \"$OSTT_BIN\""
+else
+    hyprctl dispatch exec "[float] alacritty --title ostt -e \"$OSTT_BIN\""
+fi
 
 # small delay so the process exists and we can grab PID
 sleep 0.5
