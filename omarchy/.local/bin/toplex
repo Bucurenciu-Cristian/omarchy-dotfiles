@@ -1,0 +1,155 @@
+#!/bin/bash
+#
+# toplex - Transfer media files to Plex server
+#
+# Usage:
+#   toplex <file_or_folder>           # Transfer to root of plex-media
+#   toplex -t <file_or_folder>        # Transfer to plex-media/tv/
+#   toplex -m <file_or_folder>        # Transfer to plex-media/movies/
+#   toplex -d <subdir> <file_or_folder>  # Transfer to plex-media/<subdir>/
+#   toplex --scan                     # Trigger Plex library scan
+#   toplex -l                         # List remote plex-media contents
+#
+
+set -e
+
+# Configuration
+REMOTE_HOST="ubuntu"
+REMOTE_BASE="/mnt/external-hdd/plex-media"
+LOCAL_DEFAULT="$HOME/qbit"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+usage() {
+    echo -e "${BLUE}toplex${NC} - Transfer media to Plex server"
+    echo ""
+    echo "Usage:"
+    echo "  toplex <file_or_folder>              Transfer to plex-media root"
+    echo "  toplex -t <file_or_folder>           Transfer to plex-media/tv/"
+    echo "  toplex -m <file_or_folder>           Transfer to plex-media/movies/"
+    echo "  toplex -d <subdir> <file_or_folder>  Transfer to plex-media/<subdir>/"
+    echo "  toplex --scan                        Trigger Plex library scan"
+    echo "  toplex -l [subdir]                   List remote contents"
+    echo "  toplex --dry-run <args>              Show what would be transferred"
+    echo ""
+    echo "Examples:"
+    echo "  toplex Movie.Name.2024.mkv"
+    echo "  toplex -t 'Show.Name.S01.Complete/'"
+    echo "  toplex -m -d 'Action' Movie.mkv"
+}
+
+list_remote() {
+    local subdir="${1:-}"
+    echo -e "${BLUE}Contents of ${REMOTE_BASE}/${subdir}:${NC}"
+    ssh "$REMOTE_HOST" "ls -lh '${REMOTE_BASE}/${subdir}' 2>/dev/null || echo 'Directory empty or does not exist'"
+}
+
+trigger_scan() {
+    echo -e "${YELLOW}Triggering Plex library scan...${NC}"
+
+    local PLEX_TOKEN="_QFuhwDHU3HoVPUw1eQY"
+
+    ssh "$REMOTE_HOST" "curl -s -X POST 'http://localhost:32400/library/sections/all/refresh?X-Plex-Token=${PLEX_TOKEN}'" && {
+        echo -e "${GREEN}Scan triggered!${NC}"
+        return 0
+    }
+
+    echo -e "${YELLOW}Auto-scan failed. Scan manually in Plex UI.${NC}"
+}
+
+transfer() {
+    local source="$1"
+    local dest_subdir="$2"
+    local dry_run="$3"
+
+    local dest_path="${REMOTE_BASE}"
+    [[ -n "$dest_subdir" ]] && dest_path="${REMOTE_BASE}/${dest_subdir}"
+
+    # Resolve source path
+    if [[ ! -e "$source" ]]; then
+        # Try relative to LOCAL_DEFAULT
+        if [[ -e "${LOCAL_DEFAULT}/${source}" ]]; then
+            source="${LOCAL_DEFAULT}/${source}"
+        else
+            echo -e "${RED}Error: File or folder not found: ${source}${NC}"
+            exit 1
+        fi
+    fi
+
+    # Ensure remote directory exists
+    echo -e "${BLUE}Ensuring remote directory exists: ${dest_path}${NC}"
+    ssh "$REMOTE_HOST" "mkdir -p '${dest_path}'"
+
+    # Build rsync command
+    local rsync_opts="-avz --progress --human-readable"
+    [[ "$dry_run" == "true" ]] && rsync_opts="$rsync_opts --dry-run"
+
+    echo -e "${GREEN}Transferring:${NC} $(basename "$source")"
+    echo -e "${GREEN}To:${NC} ${REMOTE_HOST}:${dest_path}/"
+    echo ""
+
+    rsync $rsync_opts "$source" "${REMOTE_HOST}:${dest_path}/"
+
+    if [[ "$dry_run" != "true" ]]; then
+        echo ""
+        echo -e "${BLUE}Setting ownership to plex:plex...${NC}"
+        ssh -t "$REMOTE_HOST" "sudo chown -R plex:plex '${dest_path}'" 2>/dev/null || \
+            echo -e "${YELLOW}Warning: Could not chown to plex. You may need to run: ssh -t ubuntu 'sudo chown -R plex:plex ${dest_path}'${NC}"
+        echo -e "${GREEN}Transfer complete!${NC}"
+        echo -e "${YELLOW}Tip: Run 'toplex --scan' to update Plex library${NC}"
+    fi
+}
+
+# Parse arguments
+DEST_SUBDIR=""
+DRY_RUN="false"
+SOURCE=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -t|--tv)
+            DEST_SUBDIR="tv"
+            shift
+            ;;
+        -m|--movies)
+            DEST_SUBDIR="movies"
+            shift
+            ;;
+        -d|--dir)
+            DEST_SUBDIR="$2"
+            shift 2
+            ;;
+        -l|--list)
+            list_remote "${2:-}"
+            exit 0
+            ;;
+        --scan)
+            trigger_scan
+            exit 0
+            ;;
+        --dry-run)
+            DRY_RUN="true"
+            shift
+            ;;
+        *)
+            SOURCE="$1"
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$SOURCE" ]]; then
+    usage
+    exit 1
+fi
+
+transfer "$SOURCE" "$DEST_SUBDIR" "$DRY_RUN"
