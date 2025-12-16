@@ -34,4 +34,9 @@
 	helper = !/usr/bin/gh auth git-credential
 [user]
 	email = bucurenciu.cristian@gmail.com
-	name = Cristian Bucurenciu
+	name = Bucurenciu Bogdan Cristian
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
