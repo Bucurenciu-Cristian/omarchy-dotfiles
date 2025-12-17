@@ -20,6 +20,7 @@ export PATH=$HOME/.local/bin:$PATH
 export PATH="/home/kicky/.cache/.bun/bin:$PATH"
 alias superset='/home/kicky/dev/superset/apps/desktop/release/superset-0.0.3-x86_64.AppImage'
 alias claude="claude --dangerously-skip-permissions"
+alias suspend="systemctl suspend"
 
 # opcode alias
 alias opcode="/home/kicky/Work/tries/2025-12-13-opcode/opcode/src-tauri/target/release/opcode"
