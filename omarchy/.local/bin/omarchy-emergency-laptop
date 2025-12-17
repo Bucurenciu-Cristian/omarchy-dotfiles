@@ -1,0 +1,14 @@
+#!/bin/bash
+# Emergency fallback - disable all external monitors, enable laptop only
+
+# Get all monitors except eDP-1 and disable them
+hyprctl monitors -j | jq -r '.[].name' | while read mon; do
+    if [[ "$mon" != "eDP-1" ]]; then
+        hyprctl keyword monitor "$mon,disable"
+    fi
+done
+
+# Force enable laptop display
+hyprctl keyword monitor "eDP-1,2880x1920@120,0x0,2"
+
+notify-send "Emergency Mode" "Laptop display enabled, externals disabled" -t 3000
