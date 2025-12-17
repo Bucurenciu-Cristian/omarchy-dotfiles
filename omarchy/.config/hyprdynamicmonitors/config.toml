@@ -1,10 +1,35 @@
 [general]
 destination = "$HOME/.config/hypr/monitors.conf"
 debounce_time_ms = 1000
+# post_apply_exec = "hyprctl reload"  # uncomment if needed
+
+[notifications]
+disabled = false
+timeout_ms = 3000
 
 [fallback_profile]
+name = "laptop"  # ignored by hyprdynamicmonitors (hardcoded as "fallback")
 config_file = "hyprconfigs/laptop.conf"
 config_file_type = "static"
+
+[profiles.laptop-battery]
+config_file = "hyprconfigs/laptop-battery.conf"
+config_file_type = "static"
+[profiles.laptop-battery.conditions]
+power_state = "BAT"
+[[profiles.laptop-battery.conditions.required_monitors]]
+description = "California Institute"
+match_description_using_regex = true
+
+# [profiles.laptop-arzopa]
+# config_file = "hyprconfigs/laptop-arzopa.conf"
+# config_file_type = "static"
+# [[profiles.laptop-arzopa.conditions.required_monitors]]
+# description = "California Institute"
+# match_description_using_regex = true
+# [[profiles.laptop-arzopa.conditions.required_monitors]]
+# description = "ARZOPA"
+# match_description_using_regex = true
 
 [profiles.iiyama]
 config_file = "hyprconfigs/external.go.tmpl"

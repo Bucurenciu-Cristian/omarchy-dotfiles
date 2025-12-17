@@ -3,7 +3,7 @@
 # Power: {{.PowerState}}
 
 monitor={{$ext.Name}},{{.res}}@{{if isOnAC}}{{.refresh_ac}}{{else}}{{.refresh_bat}}{{end}},0x0,{{.scale}}
-monitor=desc:California Institute of Technology 0x1319,disable
+monitor=eDP-1,disable
 
 # All workspaces on external
 workspace = 1,monitor:{{$ext.Name}},default:true
