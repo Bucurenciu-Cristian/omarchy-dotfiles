@@ -14,18 +14,32 @@
 #   ubuntu (remote) - SSH + rsync transfer to remote Plex server
 #   local (omarchy) - Local sudo mv to /usr/lib/plexmediaserver/
 #
+# Configuration:
+#   Create ~/.config/toplex/config with:
+#     REMOTE_PLEX_TOKEN="your_remote_token_here"
+#     LOCAL_PLEX_TOKEN="your_local_token_here"
+#
 
 set -e
+set -u
 
 # Configuration
-TARGETS=("ubuntu" "local")
+TOPLEX_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/toplex/config"
 REMOTE_HOST="ubuntu"
 REMOTE_BASE="/mnt/external-hdd/plex-media"
 LOCAL_BASE="/usr/lib/plexmediaserver"
 LOCAL_DEFAULT="$HOME/qbit"
-REMOTE_PLEX_TOKEN="_QFuhwDHU3HoVPUw1eQY"
-LOCAL_PLEX_TOKEN="<your_local_plex_token>"
 STATE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/toplex/last-target"
+
+# Token defaults (will be overridden by config file)
+REMOTE_PLEX_TOKEN=""
+LOCAL_PLEX_TOKEN=""
+
+# Source config file if it exists
+if [[ -f "$TOPLEX_CONFIG" ]]; then
+    # shellcheck source=/dev/null
+    source "$TOPLEX_CONFIG"
+fi
 
 # Colors
 RED='\033[0;31m'
@@ -36,6 +50,13 @@ NC='\033[0m' # No Color
 
 # Prompt user to select a target
 prompt_target() {
+    # Check if stdin is a terminal
+    if [[ ! -t 0 ]]; then
+        echo -e "${RED}Error: Cannot prompt for target - stdin is not a terminal.${NC}" >&2
+        echo -e "${RED}Use explicit target options or run interactively.${NC}" >&2
+        exit 1
+    fi
+
     echo -e "${BLUE}Select target:${NC}" >&2
     echo "  1) ubuntu (remote)" >&2
     echo "  2) local" >&2
@@ -83,6 +104,11 @@ usage() {
     echo "  ubuntu (remote) - SSH + rsync transfer to remote Plex server"
     echo "  local (omarchy) - Local sudo mv to /usr/lib/plexmediaserver/"
     echo ""
+    echo "Configuration:"
+    echo "  Create ${TOPLEX_CONFIG} with:"
+    echo "    REMOTE_PLEX_TOKEN=\"your_remote_token_here\""
+    echo "    LOCAL_PLEX_TOKEN=\"your_local_token_here\""
+    echo ""
     echo "Examples:"
     echo "  toplex Movie.Name.2024.mkv"
     echo "  toplex -t 'Show.Name.S01.Complete/'"
@@ -117,21 +143,37 @@ trigger_scan() {
     echo -e "${YELLOW}Triggering Plex library scan on ${target}...${NC}"
 
     if [[ "$target" == "ubuntu" ]]; then
-        ssh "$REMOTE_HOST" "curl -s -X POST 'http://localhost:32400/library/sections/all/refresh?X-Plex-Token=${REMOTE_PLEX_TOKEN}'" && {
+        # Validate remote token
+        if [[ -z "$REMOTE_PLEX_TOKEN" || "$REMOTE_PLEX_TOKEN" == "your_remote_token_here" ]]; then
+            echo -e "${RED}Error: REMOTE_PLEX_TOKEN not configured.${NC}" >&2
+            echo -e "${RED}Please set it in ${TOPLEX_CONFIG}${NC}" >&2
+            return 1
+        fi
+        if ssh "$REMOTE_HOST" "curl -s -X POST 'http://localhost:32400/library/sections/all/refresh?X-Plex-Token=${REMOTE_PLEX_TOKEN}'"; then
             echo -e "${GREEN}Scan triggered on ${target}!${NC}"
             return 0
-        }
+        else
+            echo -e "${YELLOW}Auto-scan failed. Scan manually in Plex UI.${NC}"
+            return 1
+        fi
     elif [[ "$target" == "local" ]]; then
-        curl -s -X POST "http://localhost:32400/library/sections/all/refresh?X-Plex-Token=${LOCAL_PLEX_TOKEN}" && {
+        # Validate local token
+        if [[ -z "$LOCAL_PLEX_TOKEN" || "$LOCAL_PLEX_TOKEN" == "your_local_token_here" ]]; then
+            echo -e "${RED}Error: LOCAL_PLEX_TOKEN not configured.${NC}" >&2
+            echo -e "${RED}Please set it in ${TOPLEX_CONFIG}${NC}" >&2
+            return 1
+        fi
+        if curl -s -X POST "http://localhost:32400/library/sections/all/refresh?X-Plex-Token=${LOCAL_PLEX_TOKEN}"; then
             echo -e "${GREEN}Scan triggered on ${target}!${NC}"
             return 0
-        }
+        else
+            echo -e "${YELLOW}Auto-scan failed. Scan manually in Plex UI.${NC}"
+            return 1
+        fi
     else
         echo -e "${RED}Unknown target: ${target}${NC}"
         return 1
     fi
-
-    echo -e "${YELLOW}Auto-scan failed. Scan manually in Plex UI.${NC}"
 }
 
 transfer() {
@@ -178,15 +220,15 @@ transfer_remote() {
     echo -e "${BLUE}Ensuring remote directory exists: ${dest_path}${NC}"
     ssh "$REMOTE_HOST" "mkdir -p '${dest_path}'"
 
-    # Build rsync command
-    local rsync_opts="-avz --progress --human-readable"
-    [[ "$dry_run" == "true" ]] && rsync_opts="$rsync_opts --dry-run"
+    # Build rsync command with array
+    local rsync_opts=(-avz --progress --human-readable)
+    [[ "$dry_run" == "true" ]] && rsync_opts+=(--dry-run)
 
     echo -e "${GREEN}Transferring:${NC} $(basename "$source")"
     echo -e "${GREEN}To:${NC} ${REMOTE_HOST}:${dest_path}/"
     echo ""
 
-    rsync $rsync_opts "$source" "${REMOTE_HOST}:${dest_path}/"
+    rsync "${rsync_opts[@]}" "$source" "${REMOTE_HOST}:${dest_path}/"
 
     if [[ "$dry_run" != "true" ]]; then
         echo ""
@@ -260,9 +302,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -l|--list)
             DO_LIST="true"
-            LIST_SUBDIR="${2:-}"
             shift
-            [[ $# -gt 0 && ! "$1" =~ ^- ]] && { LIST_SUBDIR="$1"; shift; }
+            if [[ $# -gt 0 && ! "$1" =~ ^- ]]; then
+                LIST_SUBDIR="$1"
+                shift
+            fi
             ;;
         --scan)
             trigger_scan
