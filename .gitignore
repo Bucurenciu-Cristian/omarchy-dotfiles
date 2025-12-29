@@ -10,3 +10,4 @@
 # Uncomment if you add sensitive data later
 # omarchy/.ssh/
 # omarchy/.gnupg/
+omarchy/.config/hypr/monitors.conf
