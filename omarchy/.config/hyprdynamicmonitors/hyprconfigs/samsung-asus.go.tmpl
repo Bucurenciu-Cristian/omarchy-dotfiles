@@ -1,0 +1,30 @@
+{{- $samsung := index .MonitorsByTag "samsung" -}}
+{{- $asus := index .MonitorsByTag "asus" -}}
+# Dual External: Samsung (left) + ASUS (right)
+# Samsung: {{$samsung.Description}} via {{$samsung.Name}}
+# ASUS: {{$asus.Description}} via {{$asus.Name}}
+# Power: {{.PowerState}}
+
+# Samsung (left) - 1920x1080
+monitor={{$samsung.Name}},1920x1080@{{if isOnAC}}120{{else}}60{{end}},0x0,1.0
+
+# ASUS (right) - 3440x1440, positioned after Samsung's width
+monitor={{$asus.Name}},3440x1440@{{if isOnAC}}100{{else}}60{{end}},1920x0,1.25
+
+# Laptop disabled
+monitor=eDP-1,disable
+
+# All workspaces on ASUS
+workspace = 1,monitor:{{$asus.Name}},default:true
+workspace = 2,monitor:{{$asus.Name}}
+workspace = 3,monitor:{{$asus.Name}}
+workspace = 4,monitor:{{$asus.Name}}
+workspace = 5,monitor:{{$asus.Name}}
+workspace = 6,monitor:{{$asus.Name}}
+workspace = 7,monitor:{{$asus.Name}}
+workspace = 8,monitor:{{$asus.Name}}
+workspace = 9,monitor:{{$asus.Name}}
+workspace = 10,monitor:{{$asus.Name}}
+
+# Special workspace for movies on Samsung
+workspace = special:movies,monitor:{{$samsung.Name}}

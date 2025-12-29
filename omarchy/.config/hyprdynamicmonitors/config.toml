@@ -12,24 +12,20 @@ name = "laptop"  # ignored by hyprdynamicmonitors (hardcoded as "fallback")
 config_file = "hyprconfigs/laptop.conf"
 config_file_type = "static"
 
-[profiles.laptop-battery]
-config_file = "hyprconfigs/laptop-battery.conf"
-config_file_type = "static"
-[profiles.laptop-battery.conditions]
-power_state = "BAT"
-[[profiles.laptop-battery.conditions.required_monitors]]
-description = "California Institute"
-match_description_using_regex = true
+# External monitor profiles (checked first - higher priority)
 
-# [profiles.laptop-arzopa]
-# config_file = "hyprconfigs/laptop-arzopa.conf"
-# config_file_type = "static"
-# [[profiles.laptop-arzopa.conditions.required_monitors]]
-# description = "California Institute"
-# match_description_using_regex = true
-# [[profiles.laptop-arzopa.conditions.required_monitors]]
-# description = "ARZOPA"
-# match_description_using_regex = true
+# Dual external: Samsung + ASUS (must be before individual profiles)
+[profiles.samsung-asus]
+config_file = "hyprconfigs/samsung-asus.go.tmpl"
+config_file_type = "template"
+[[profiles.samsung-asus.conditions.required_monitors]]
+description = "Samsung"
+match_description_using_regex = true
+monitor_tag = "samsung"
+[[profiles.samsung-asus.conditions.required_monitors]]
+description = "VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
 
 [profiles.iiyama]
 config_file = "hyprconfigs/external.go.tmpl"
@@ -82,3 +78,6 @@ scale = "1.0"
 description = "Samsung"
 match_description_using_regex = true
 monitor_tag = "external"
+
+# laptop-battery profile removed - was conflicting with external profiles
+# Fallback laptop.conf handles laptop-only cases

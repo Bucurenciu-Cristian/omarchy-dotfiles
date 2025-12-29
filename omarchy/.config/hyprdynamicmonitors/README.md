@@ -16,11 +16,18 @@ Automatic monitor profile switching for Hyprland using [hyprdynamicmonitors](htt
 
 | Profile | Match Regex | Resolution | AC Hz | Battery Hz | Scale |
 |---------|-------------|------------|-------|------------|-------|
+| samsung-asus | Samsung + VG34VQ | Dual (see below) | - | - | - |
 | iiyama | PL3481WQ | 3440x1440 | 180 | 60 | 1.25 |
 | asus | VG34VQ | 3440x1440 | 100 | 60 | 1.25 |
 | arzopa | ARZOPA | 1920x1080 | 60 | 60 | 1.0 |
 | samsung | Samsung | 1920x1080 | 120 | 60 | 1.0 |
 | laptop | (fallback) | 2880x1920 | 60 | 60 | 2.0 |
+
+### samsung-asus (Dual External)
+- **Samsung** (left): 1920x1080 @ 120Hz (AC) / 60Hz (battery)
+- **ASUS** (right): 3440x1440 @ 100Hz (AC) / 60Hz (battery), scale 1.25
+- **Laptop**: disabled
+- **Workspaces**: 1-10 on ASUS, special:movies on Samsung
 
 ## Behavior
 
