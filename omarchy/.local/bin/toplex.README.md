@@ -1,30 +1,63 @@
 # toplex
 
-Transfer media files to Plex server via rsync over SSH (Tailscale).
+Transfer media files to Plex server — supports both remote (SSH/rsync) and local transfers.
+
+## Targets
+
+| Target | Method | Destination |
+|--------|--------|-------------|
+| `ubuntu` (remote) | rsync over SSH | `/mnt/external-hdd/plex-media/` |
+| `local` (omarchy) | sudo mv | `/usr/lib/plexmediaserver/` |
 
 ## Requirements
 
-- SSH access to Plex server (hostname: `ubuntu` via Tailscale magic DNS)
-- rsync installed on both local and remote
-- Plex Media Server running on remote
+- **Remote**: SSH access to Plex server (hostname: `ubuntu` via Tailscale magic DNS), rsync
+- **Local**: Plex Media Server running locally, sudo access
 
 ## Configuration
 
-Edit these variables in the script if needed:
+Create `~/.config/toplex/config` with your Plex tokens:
 
 ```bash
-REMOTE_HOST="ubuntu"                        # SSH hostname
-REMOTE_BASE="/mnt/external-hdd/plex-media"  # Plex media directory
-PLEX_TOKEN="your_token_here"                # For library scan API
+mkdir -p ~/.config/toplex
+cat > ~/.config/toplex/config << 'EOF'
+REMOTE_PLEX_TOKEN="your_remote_token_here"
+LOCAL_PLEX_TOKEN="your_local_token_here"
+EOF
 ```
 
-### Getting your Plex token
+### Getting your Plex tokens
 
+**Remote (ubuntu):**
 ```bash
 ssh ubuntu "sudo grep -oP 'PlexOnlineToken=\"\K[^\"]+' '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Preferences.xml'"
 ```
 
+**Local (omarchy):**
+```bash
+sudo grep -oP 'PlexOnlineToken="\K[^"]+' '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Preferences.xml'
+```
+
 ## Usage
+
+### Target Selection
+
+toplex remembers your last used target (sticky selection):
+
+```bash
+# First run: prompts for target, then remembers
+toplex -t show.mkv
+
+# Use remembered target (no prompt)
+toplex -t another-show.mkv
+
+# Override with explicit flags
+toplex -r -t show.mkv     # Force remote (ubuntu), save as default
+toplex -L -t show.mkv     # Force local, save as default
+toplex --pick -t show.mkv # Force prompt, save choice as default
+```
+
+### Transfer Commands
 
 ```bash
 # Transfer to plex-media root
@@ -41,39 +74,63 @@ toplex -d <subdir> <file_or_folder>
 
 # Dry run (preview without transferring)
 toplex --dry-run -t <file_or_folder>
+```
 
-# List remote contents
+### Other Commands
+
+```bash
+# List contents (uses last target)
 toplex -l           # List root
 toplex -l tv        # List tv/
 toplex -l movies    # List movies/
 
-# Trigger Plex library scan
+# Trigger Plex library scan (uses last target)
 toplex --scan
 ```
+
+### Flags Summary
+
+| Flag | Description |
+|------|-------------|
+| `-t, --tv` | Transfer to tv/ subdirectory |
+| `-m, --movies` | Transfer to movies/ subdirectory |
+| `-d, --dir` | Transfer to custom subdirectory |
+| `-r, --remote` | Use ubuntu (remote) target, save as default |
+| `-L, --local` | Use local target, save as default |
+| `--pick` | Force interactive target prompt |
+| `-l, --list` | List contents |
+| `--scan` | Trigger Plex library scan |
+| `--dry-run` | Preview without transferring |
+| `-h, --help` | Show help |
 
 ## Examples
 
 ```bash
-# Transfer a TV show season
+# Set local as default, transfer a movie
+toplex -L -m "Inception.2010.2160p.UHD.BluRay.mkv"
+
+# Transfer TV show (uses last target - local)
 toplex -t "Breaking.Bad.S01.1080p.BluRay/"
 
-# Transfer a movie
-toplex -m "Inception.2010.2160p.UHD.BluRay.mkv"
+# Switch to remote for this transfer
+toplex -r -t "Show.Name.S02/"
 
-# Transfer to custom folder
-toplex -d "documentaries" "Planet.Earth.S01/"
+# Preview what would be transferred
+toplex --dry-run -m "Movie.Name.2024.mkv"
 
-# Preview transfer first
-toplex --dry-run -t "Show.Name.S01/"
+# List what's on the current target
+toplex -l movies
 
-# After transfer, scan library
+# After transfers, scan the library
 toplex --scan
 ```
 
-## Directory structure
+## Directory Structure
+
+Both targets use the same structure:
 
 ```
-/mnt/external-hdd/plex-media/
+{base}/
 ├── tv/
 │   └── Show.Name.S01/
 │       ├── Show.Name.S01E01.mkv
@@ -82,26 +139,33 @@ toplex --scan
     └── Movie.Name.2024.mkv
 ```
 
-## Initial setup
+## Initial Setup
 
-1. Ensure remote directory exists and is owned by plex:
+### Remote (ubuntu)
+
+1. Create directories:
    ```bash
    ssh -t ubuntu "sudo mkdir -p /mnt/external-hdd/plex-media/{tv,movies}"
    ssh -t ubuntu "sudo chown -R plex:plex /mnt/external-hdd/plex-media"
-   ```
-
-2. Make plex-media writable by your user (for rsync):
-   ```bash
    ssh -t ubuntu "sudo chmod 775 /mnt/external-hdd/plex-media"
-   ssh -t ubuntu "sudo usermod -aG plex \$(whoami)"
    ```
 
-   Or allow your user to write, then chown to plex after (script does this automatically).
+2. Add library paths in Plex UI (Settings > Libraries)
 
-3. Add the Plex library path in Plex UI:
-   - Go to Settings > Libraries
-   - Add `/mnt/external-hdd/plex-media/tv` as TV Shows
-   - Add `/mnt/external-hdd/plex-media/movies` as Movies
+### Local (omarchy)
+
+1. Create directories:
+   ```bash
+   sudo mkdir -p /usr/lib/plexmediaserver/{tv,movies}
+   sudo chown -R plex:plex /usr/lib/plexmediaserver
+   ```
+
+2. Add library paths in Plex UI (Settings > Libraries)
+
+## State Files
+
+- **Last target**: `~/.cache/toplex/last-target`
+- **Config**: `~/.config/toplex/config`
 
 ## Troubleshooting
 
@@ -111,9 +175,11 @@ ssh -t ubuntu "sudo chown -R plex:plex /mnt/external-hdd/plex-media"
 ```
 
 **Scan returns 401:**
-Update `PLEX_TOKEN` in the script (token may have changed).
+Update tokens in `~/.config/toplex/config`
 
 **Files not appearing in Plex:**
-- Check ownership: `ssh ubuntu "ls -la /mnt/external-hdd/plex-media/"`
-- Files should be owned by `plex:plex`
+- Check ownership: files should be owned by `plex:plex`
 - Trigger manual scan: `toplex --scan`
+
+**"Cannot prompt for target - stdin is not a terminal":**
+Use explicit target flags (`-r` or `-L`) when running non-interactively.
