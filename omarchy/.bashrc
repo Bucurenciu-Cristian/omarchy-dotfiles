@@ -24,3 +24,11 @@ alias suspend="systemctl suspend"
 
 # opcode alias
 alias opcode="/home/kicky/Work/tries/2025-12-13-opcode/opcode/src-tauri/target/release/opcode"
+
+# pnpm
+export PNPM_HOME="/home/kicky/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

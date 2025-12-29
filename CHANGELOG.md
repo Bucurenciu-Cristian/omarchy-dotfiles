@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-12-21
+
+- **hyprsession** - Session persistence for Hyprland
+  - Saves window layout/workspaces, restores on restart or reboot
+  - Auto-saves every 2 minutes (`--save-interval 120`)
+  - `Super F12` manual save before logout/reboot
+  - Session stored in `~/.local/share/hyprsession/`
+  - To disable: comment out `exec_once` in `custom.conf`, run `pkill hyprsession`
+
 ## 2025-12-11
 
 - **Workspace Assignments** - Automatic window-to-workspace routing

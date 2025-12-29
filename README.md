@@ -4,7 +4,7 @@ Personal Omarchy configuration managed with GNU Stow.
 
 ## Contents
 
-- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads, workspace assignments
+- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads, workspace assignments, session persistence (hyprsession)
 - **Waybar** (`~/.config/waybar/`) - Status bar with project indicator
 - **Walker** (`~/.config/walker/`) - Application launcher
 - **Ghostty** (`~/.config/ghostty/`) - Terminal
@@ -136,4 +136,4 @@ Configured via `windowrulev2` in `~/.config/hypr/custom.conf`.
 
 ---
 
-Last Updated: 2025-12-11
+Last Updated: 2025-12-21
