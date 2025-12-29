@@ -3,12 +3,18 @@
 # toplex - Transfer media files to Plex server
 #
 # Usage:
-#   toplex <file_or_folder>           # Transfer to root of plex-media (prompts for target)
+#   toplex <file_or_folder>           # Transfer to root of plex-media (uses last target)
 #   toplex -t <file_or_folder>        # Transfer to plex-media/tv/
 #   toplex -m <file_or_folder>        # Transfer to plex-media/movies/
 #   toplex -d <subdir> <file_or_folder>  # Transfer to plex-media/<subdir>/
 #   toplex --scan                     # Trigger Plex library scan (uses last target or prompts)
-#   toplex -l [subdir]                # List plex-media contents (prompts for target)
+#   toplex -l [subdir]                # List plex-media contents (uses last target)
+#
+# Target Selection:
+#   -r, --remote     Use ubuntu (remote) target, save as default
+#   -L, --local      Use local target, save as default
+#   --pick           Force interactive target prompt, save choice as default
+#   (no flag)        Use last target from state file, prompt on first run
 #
 # Targets:
 #   ubuntu (remote) - SSH + rsync transfer to remote Plex server
@@ -88,17 +94,49 @@ read_target_state() {
     fi
 }
 
+# Get target based on flags, state file, or prompt
+# Uses global variables: TARGET, FORCE_PICK
+get_target() {
+    local target=""
+
+    # If TARGET already set by flag (-r/--remote or -L/--local), use it
+    if [[ -n "${TARGET:-}" ]]; then
+        target="$TARGET"
+    # If --pick flag set, force interactive prompt
+    elif [[ "${FORCE_PICK:-}" == "true" ]]; then
+        target=$(prompt_target)
+    else
+        # Try to read from state file
+        target=$(read_target_state)
+        # If state file empty/missing, prompt
+        if [[ -z "$target" ]]; then
+            target=$(prompt_target)
+        fi
+    fi
+
+    # Save the target to state file
+    save_target_state "$target"
+
+    echo "$target"
+}
+
 usage() {
     echo -e "${BLUE}toplex${NC} - Transfer media to Plex server"
     echo ""
     echo "Usage:"
-    echo "  toplex <file_or_folder>              Transfer to plex-media root (prompts for target)"
+    echo "  toplex <file_or_folder>              Transfer to plex-media root (uses last target)"
     echo "  toplex -t <file_or_folder>           Transfer to plex-media/tv/"
     echo "  toplex -m <file_or_folder>           Transfer to plex-media/movies/"
     echo "  toplex -d <subdir> <file_or_folder>  Transfer to plex-media/<subdir>/"
     echo "  toplex --scan                        Trigger Plex library scan (uses last target)"
-    echo "  toplex -l [subdir]                   List plex-media contents (prompts for target)"
+    echo "  toplex -l [subdir]                   List plex-media contents (uses last target)"
     echo "  toplex --dry-run <args>              Show what would be transferred"
+    echo ""
+    echo "Target Selection:"
+    echo "  -r, --remote   Use ubuntu (remote) target, save as default"
+    echo "  -L, --local    Use local target, save as default"
+    echo "  --pick         Force interactive target prompt, save choice as default"
+    echo "  (no flag)      Use last target from state file, prompt on first run"
     echo ""
     echo "Targets:"
     echo "  ubuntu (remote) - SSH + rsync transfer to remote Plex server"
@@ -110,9 +148,12 @@ usage() {
     echo "    LOCAL_PLEX_TOKEN=\"your_local_token_here\""
     echo ""
     echo "Examples:"
-    echo "  toplex Movie.Name.2024.mkv"
-    echo "  toplex -t 'Show.Name.S01.Complete/'"
-    echo "  toplex -m -d 'Action' Movie.mkv"
+    echo "  toplex -t show.mkv           Uses last target (ubuntu or local)"
+    echo "  toplex -r -t show.mkv        Forces ubuntu, saves as default"
+    echo "  toplex -L -t show.mkv        Forces local, saves as default"
+    echo "  toplex --pick -t show.mkv    Prompts, saves choice as default"
+    echo "  toplex -l                    Lists using last target"
+    echo "  toplex -l --pick             Lists after prompting for target"
 }
 
 list_contents() {
@@ -281,12 +322,26 @@ DRY_RUN="false"
 SOURCE=""
 LIST_SUBDIR=""
 DO_LIST="false"
+TARGET=""
+FORCE_PICK="false"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         -h|--help)
             usage
             exit 0
+            ;;
+        -r|--remote)
+            TARGET="ubuntu"
+            shift
+            ;;
+        -L|--local)
+            TARGET="local"
+            shift
+            ;;
+        --pick)
+            FORCE_PICK="true"
+            shift
             ;;
         -t|--tv)
             DEST_SUBDIR="tv"
@@ -325,7 +380,7 @@ done
 
 # Handle list command
 if [[ "$DO_LIST" == "true" ]]; then
-    TARGET=$(prompt_target)
+    TARGET=$(get_target)
     list_contents "$TARGET" "$LIST_SUBDIR"
     exit 0
 fi
@@ -335,6 +390,6 @@ if [[ -z "$SOURCE" ]]; then
     exit 1
 fi
 
-# Prompt for target before transfer
-TARGET=$(prompt_target)
+# Get target (from flag, state file, or prompt) before transfer
+TARGET=$(get_target)
 transfer "$SOURCE" "$DEST_SUBDIR" "$DRY_RUN" "$TARGET"
