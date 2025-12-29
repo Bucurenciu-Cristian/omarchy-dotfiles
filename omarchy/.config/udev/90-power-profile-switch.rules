@@ -1,0 +1,9 @@
+# Automatic power profile switching on AC/battery change
+# Install: sudo cp ~/.config/udev/90-power-profile-switch.rules /etc/udev/rules.d/
+# Reload: sudo udevadm control --reload-rules
+
+# Trigger on AC adapter state change
+SUBSYSTEM=="power_supply", ATTR{type}=="Mains", RUN+="/home/kicky/.local/bin/omarchy-power-profile-switch"
+
+# Also trigger on USB-C power delivery changes (for USB-C charging laptops)
+SUBSYSTEM=="power_supply", ATTR{type}=="USB", RUN+="/home/kicky/.local/bin/omarchy-power-profile-switch"

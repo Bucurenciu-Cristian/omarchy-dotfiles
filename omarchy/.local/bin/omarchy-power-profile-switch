@@ -1,0 +1,51 @@
+#!/bin/bash
+# Automatic power profile switching based on AC/battery state
+# Triggered by udev rule on power supply changes
+
+LOGFILE="/tmp/power-profile-switch.log"
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOGFILE"
+}
+
+# Check if on AC power (ADP1 online = 1)
+if [ -f /sys/class/power_supply/ADP1/online ]; then
+    AC_STATUS=$(cat /sys/class/power_supply/ADP1/online)
+else
+    # Fallback: check any Mains type supply
+    AC_STATUS=0
+    for supply in /sys/class/power_supply/*/type; do
+        if [ "$(cat "$supply" 2>/dev/null)" = "Mains" ]; then
+            online_file="${supply%/type}/online"
+            if [ "$(cat "$online_file" 2>/dev/null)" = "1" ]; then
+                AC_STATUS=1
+                break
+            fi
+        fi
+    done
+fi
+
+if [ "$AC_STATUS" = "1" ]; then
+    TARGET_PROFILE="performance"
+else
+    TARGET_PROFILE="power-saver"
+fi
+
+CURRENT_PROFILE=$(powerprofilesctl get 2>/dev/null)
+
+if [ "$CURRENT_PROFILE" != "$TARGET_PROFILE" ]; then
+    log "Switching from '$CURRENT_PROFILE' to '$TARGET_PROFILE' (AC=$AC_STATUS)"
+    powerprofilesctl set "$TARGET_PROFILE"
+
+    # Optional: send notification if notify-send is available and DISPLAY is set
+    if command -v notify-send &>/dev/null; then
+        # Run as the logged-in user for notifications
+        DISPLAY_USER=$(who | grep -E '\(:0\)|\(:[0-9]+\)' | head -1 | awk '{print $1}')
+        if [ -n "$DISPLAY_USER" ]; then
+            sudo -u "$DISPLAY_USER" DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u "$DISPLAY_USER")/bus" \
+                notify-send -u low "Power Profile" "Switched to $TARGET_PROFILE" 2>/dev/null || true
+        fi
+    fi
+else
+    log "Already on '$TARGET_PROFILE' (AC=$AC_STATUS)"
+fi
