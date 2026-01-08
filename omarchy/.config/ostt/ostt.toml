@@ -71,7 +71,7 @@ profanity_filter = false
 punctuate = true
 
 # Apply smart formatting to transcript output for improved readability
-smart_format = false
+smart_format = true
 
 # Segment speech into meaningful semantic units
 utterances = false
