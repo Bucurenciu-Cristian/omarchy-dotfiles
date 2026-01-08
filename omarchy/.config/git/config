@@ -17,6 +17,7 @@
 	mnemonicPrefix = true    # More intuitive refs in diff output
 [commit]
 	verbose = true           # Include diff comment in commit message template
+	gpgsign = true
 [column]
 	ui = auto 			     # Output in columns when possible
 [branch]
@@ -35,8 +36,13 @@
 [user]
 	email = bucurenciu.cristian@gmail.com
 	name = Bucurenciu Bogdan Cristian
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbUtHz+tTnknNkBxLEZ9BnEIlvSfPhq4BJpXgU/2JNp
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /opt/1Password/op-ssh-sign
