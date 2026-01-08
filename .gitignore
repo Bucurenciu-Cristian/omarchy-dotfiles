@@ -11,3 +11,10 @@
 # omarchy/.ssh/
 # omarchy/.gnupg/
 omarchy/.config/hypr/monitors.conf
+
+# External Claude skill repos (clone separately)
+# - omarchy-skill: system default from ~/.local/share/omarchy/
+# - planning-with-files: https://github.com/OthmanAdi/planning-with-files
+omarchy-skill/
+omarchy/.claude/skills/omarchy
+omarchy/.claude/skills/planning-with-files/
