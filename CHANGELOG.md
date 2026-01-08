@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-01-09
+
+- **System Replication Guide** - Complete documentation for reproducing this setup
+  - Theme installation commands for all 7 custom themes
+  - Stow deployment instructions
+  - Additional setup steps (mise, 1Password, systemd, udev)
+- **Terminal configs added to dotfiles**
+  - Alacritty with theme integration, font size 9, padding
+  - Kitty with remote control, powerline tabs, vim-style copy/paste
+  - Btop with vim keys, braille graphs, battery monitoring
+- **Git ignore** - Global ignore for `.claude/settings.local.json`
+
+## 2026-01-08
+
+- **Gitignore** - Exclude external Claude skill repos (with source URLs for reference)
+- **monitors.conf** - Stop tracking auto-generated file from hyprdynamicmonitors
+
+## 2026-01-07
+
+- **Voxtype** - Voice typing integration with waybar status indicator
+- **ostt** - Enable smart_format for better transcription
+- **mise** - Pin tool versions (go 1.23, node 22, python 3.12)
+
+## 2025-12-29
+
+- **Idle timeout** - Reduce lock timeout to 151 seconds
+- **1Password SSH Agent** - Add SSH_AUTH_SOCK to bashrc
+- **Voxtype + 1Password** - Initial configs and SSH agent setup
+
+## 2025-12-22
+
+- **Power management**
+  - Battery conservation systemd service
+  - Udev rules for automatic power profile switching
+  - Power profile switch script
+
 ## 2025-12-21
 
 - **hyprsession** - Session persistence for Hyprland

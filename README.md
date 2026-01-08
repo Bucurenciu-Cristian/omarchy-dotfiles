@@ -4,19 +4,35 @@ Personal Omarchy configuration managed with GNU Stow.
 
 ## Contents
 
-- **Hyprland** (`~/.config/hypr/`) - Window manager configs, project scratchpads, workspace assignments, session persistence (hyprsession)
-- **Waybar** (`~/.config/waybar/`) - Status bar with project indicator
+### Window Manager & Desktop
+- **Hyprland** (`~/.config/hypr/`) - Window manager, keybindings, monitors, project scratchpads, workspace assignments
+- **Waybar** (`~/.config/waybar/`) - Status bar with project indicator, voxtype status
 - **Walker** (`~/.config/walker/`) - Application launcher
-- **Ghostty** (`~/.config/ghostty/`) - Terminal
+
+### Terminals
+- **Ghostty** (`~/.config/ghostty/`) - Primary terminal
+- **Alacritty** (`~/.config/alacritty/`) - Secondary terminal with theme integration
+- **Kitty** (`~/.config/kitty/`) - Alternative terminal with remote control
+
+### Editors & Dev Tools
 - **Neovim** (`~/.config/nvim/`) - LazyVim config with Omarchy theme hotreload
 - **Zed** (`~/.config/zed/`) - Editor settings with MCP Docker
-- **ostt** (`~/.config/ostt/`) - Speech-to-text config (Deepgram)
-- **mise** (`~/.config/mise/`) - Dev tool versions (bun, node, python)
+- **Git** (`~/.config/git/`) - Git config and global ignore patterns
+- **mise** (`~/.config/mise/`) - Pinned tool versions (go 1.23, node 22, python 3.12)
+
+### Utilities
+- **Tmux** (`~/.config/tmux/`) - Terminal multiplexer with TPM plugins
+- **Tmux-Sessionizer** (`~/.local/bin/`) - Project session manager with fzf
+- **Btop** (`~/.config/btop/`) - System monitor with vim keys
+- **ostt** (`~/.config/ostt/`) - Speech-to-text (Deepgram)
+- **Voxtype** (`~/.config/voxtype/`) - Voice typing
+
+### System
+- **1Password** (`~/.config/1Password/`) - SSH agent configuration
 - **UWSM** (`~/.config/uwsm/`) - Session manager
-- **Tmux** (`~/.config/tmux/`) - Terminal multiplexer config with TPM plugins
-- **Tmux-Sessionizer** (`~/.local/bin/`) - Project session manager with fzf integration
-- **Shell** (`~/.bashrc`) - Bash config
-- **XCompose** (`~/.XCompose`) - Custom compose sequences
+- **Systemd** (`~/.config/systemd/user/`) - Battery conservation service
+- **Udev** (`~/.config/udev/`) - Power profile switching rules
+- **Shell** (`~/.bashrc`) - Bash config with aliases
 
 ## Installation on New Machine
 
@@ -26,9 +42,11 @@ sudo pacman -S stow
 
 # Clone and deploy
 git clone https://github.com/Bucurenciu-Cristian/omarchy-dotfiles.git ~/dotfiles
-cd ~/dotfiles
-stow omarchy
+cd ~/dotfiles/omarchy
+stow -t ~ .
 ```
+
+For complete system replication including themes, see **[docs/SYSTEM-REPLICATION.md](docs/SYSTEM-REPLICATION.md)**.
 
 ## Managing Configs
 
@@ -136,4 +154,4 @@ Configured via `windowrulev2` in `~/.config/hypr/custom.conf`.
 
 ---
 
-Last Updated: 2025-12-21
+Last Updated: 2026-01-09
