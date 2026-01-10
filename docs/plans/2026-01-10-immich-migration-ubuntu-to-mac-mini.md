@@ -18,6 +18,31 @@ Migrate ~200GB Immich instance from Ubuntu server to Mac Mini, preserving all ph
 
 ## Migration Steps
 
+### Phase 0: Format External HDD
+
+**On Mac Mini — connect the HDD and format it:**
+
+```bash
+ssh mac-mini
+
+# List all disks to identify your HDD
+diskutil list
+
+# Look for your external HDD (e.g., /dev/disk2)
+# VERIFY THE DISK NUMBER - wrong disk = data loss!
+
+# Option A: APFS (recommended - native Mac, best performance)
+diskutil eraseDisk APFS ImmichHDD /dev/diskX
+
+# Option B: exFAT (if you want cross-platform Linux/Windows access)
+diskutil eraseDisk ExFAT ImmichHDD /dev/diskX
+```
+
+**After formatting:**
+- HDD auto-mounts at `/Volumes/ImmichHDD`
+- Verify: `ls /Volumes/ImmichHDD`
+- Check space: `df -h /Volumes/ImmichHDD`
+
 ### Phase 1: Pre-Flight Checks
 
 ```bash
