@@ -45,6 +45,17 @@ diskutil eraseDisk ExFAT ImmichHDD /dev/diskX
 
 ### Phase 1: Pre-Flight Checks
 
+**First: Bring Ubuntu server online**
+- Boot the Ubuntu server
+- Verify it's connected to Tailscale: `tailscale status`
+- Should show "ubuntu" as online/active
+
+**Prevent Mac HDD sleep during transfer:**
+```bash
+# On Mac Mini
+sudo pmset -a disksleep 0
+```
+
 ```bash
 # On Ubuntu - verify data size
 ssh ubuntu
@@ -130,9 +141,18 @@ cat /Volumes/ImmichHDD/immich-data/database-backup/immich-database.sql \
   | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
   | docker exec -i immich_postgres psql --dbname=postgres --username=postgres
 
-# Update .env to point to external HDD
+# IMPORTANT: Fix path mismatch
+# The database stores paths as /mnt/immich-data/...
+# We need Docker to see the HDD at the same path
+
 # Edit ~/dev/immich/.env:
-#   UPLOAD_LOCATION=/Volumes/ImmichHDD/immich-data
+#   UPLOAD_LOCATION=/mnt/immich-data
+
+# Edit ~/dev/immich/docker-compose.yml under immich-server volumes:
+#   - /Volumes/ImmichHDD/immich-data:/mnt/immich-data
+
+# This maps the Mac HDD to appear as /mnt/immich-data inside the container
+# matching what the database expects
 
 # Start full stack
 docker compose up -d
