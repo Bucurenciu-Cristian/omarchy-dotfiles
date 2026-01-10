@@ -35,3 +35,21 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# Neptune sauna booking script
+neptun() {
+    local project_dir="$HOME/work/06-resources/Script Neptun"
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: neptun <command>"
+        echo ""
+        echo "Commands:"
+        echo "  run           - Interactive booking (windowed)"
+        echo "  run-headless  - Interactive booking (headless)"
+        echo "  status        - View current appointments"
+        echo "  delete        - Delete appointments"
+        echo "  collect       - Collect availability data"
+        echo "  db-status     - Show database statistics"
+        return 0
+    fi
+    make -C "$project_dir" "$@"
+}
