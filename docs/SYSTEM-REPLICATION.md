@@ -10,12 +10,40 @@ Follow [omarchy.org](https://omarchy.org/) installation instructions.
 
 ```bash
 cd ~
-git clone <your-dotfiles-repo> dotfiles
+git clone https://github.com/Bucurenciu-Cristian/omarchy-dotfiles.git dotfiles
 cd dotfiles/omarchy
 stow -t ~ .
 ```
 
-## 3. Install Custom Themes
+## 3. Reinstall Packages
+
+The repo contains package lists exported from the working system.
+
+### Official packages (pacman)
+```bash
+cd ~/dotfiles
+sudo pacman -S --needed - < packages-explicit.txt
+```
+
+### AUR packages (via yay or paru)
+```bash
+# If using yay:
+yay -S --needed $(cat packages-aur.txt | awk '{print $1}')
+
+# Or manually install each:
+cat packages-aur.txt
+# brave-bin, docker-desktop, hyprdynamicmonitors-bin, ostt, etc.
+```
+
+**Note:** Some packages may have version conflicts or be unavailable. Install what you can and troubleshoot individually.
+
+### Update package lists (for future migrations)
+```bash
+pacman -Qe > ~/dotfiles/packages-explicit.txt
+pacman -Qm > ~/dotfiles/packages-aur.txt
+```
+
+## 4. Install Custom Themes
 
 Run these commands to reinstall the custom themes:
 
@@ -34,7 +62,7 @@ Then set your preferred theme:
 omarchy-theme-set cobalt2
 ```
 
-## 4. Additional Setup
+## 5. Additional Setup
 
 ### Tools via mise
 The tool versions are pinned in `~/.config/mise/config.toml`. Run:
