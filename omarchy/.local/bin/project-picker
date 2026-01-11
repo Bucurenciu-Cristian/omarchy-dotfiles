@@ -1,18 +1,127 @@
 #!/bin/bash
-# Project Picker - fuzzy search projects with walker
+# Project Picker - CRUD interface for project scratchpads via walker
 
 CONFIG_FILE="$HOME/.config/hypr/projects.conf"
 
+# Get 80% of screen height for walker
+SCREEN_HEIGHT=$(hyprctl monitors -j | jq '.[0].height')
+WALKER_HEIGHT=$((SCREEN_HEIGHT * 80 / 100))
+
+# Menu actions
+ACTION_NEW="➕ New project"
+ACTION_DELETE="🗑️ Delete project"
+ACTION_EDIT="✏️ Edit config"
+SEPARATOR="───────────────"
+
 # Extract just project names (before any colon for autostart)
-projects=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d: -f1)
+get_projects() {
+    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d: -f1
+}
 
-# Use omarchy-launch-walker (handles service properly)
-selected=$(echo "$projects" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 200 -p "Project…" 2>/dev/null)
+# Build menu with projects + actions
+build_menu() {
+    get_projects
+    echo "$SEPARATOR"
+    echo "$ACTION_NEW"
+    echo "$ACTION_DELETE"
+    echo "$ACTION_EDIT"
+}
 
-if [[ -n "$selected" ]]; then
-    # Find index of selected project
-    idx=$(echo "$projects" | grep -n "^${selected}$" | cut -d: -f1)
-    if [[ -n "$idx" ]]; then
-        project-scratchpad-select "$idx"
+# Prompt for text input via walker
+prompt_input() {
+    local prompt="$1"
+    echo "" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "$prompt" 2>/dev/null
+}
+
+# Create new project
+create_project() {
+    local name
+    name=$(prompt_input "Project name:")
+
+    [[ -z "$name" ]] && exit 0
+
+    # Validate: no spaces, no colons, alphanumeric + dashes/underscores
+    if [[ ! "$name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        notify-send "Project Picker" "Invalid name. Use only letters, numbers, - and _"
+        exit 1
     fi
-fi
+
+    # Check if already exists
+    if grep -q "^${name}$\|^${name}:" "$CONFIG_FILE"; then
+        notify-send "Project Picker" "Project '$name' already exists"
+        exit 1
+    fi
+
+    # Append to config
+    echo "$name" >> "$CONFIG_FILE"
+    notify-send "Project Picker" "Created: $name"
+
+    # Switch to the new project
+    project-scratchpad-select "$(get_projects | grep -n "^${name}$" | cut -d: -f1)"
+}
+
+# Delete project
+delete_project() {
+    local projects
+    projects=$(get_projects)
+
+    [[ -z "$projects" ]] && notify-send "Project Picker" "No projects to delete" && exit 0
+
+    local selected
+    selected=$(echo "$projects" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "Delete which?" 2>/dev/null)
+
+    [[ -z "$selected" ]] && exit 0
+
+    # Confirm deletion
+    local confirm
+    confirm=$(printf "Yes, delete\nNo, cancel" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 2 -p "Delete '$selected'?" 2>/dev/null)
+
+    [[ "$confirm" != "Yes, delete" ]] && exit 0
+
+    # Remove from config (handles both "project" and "project:autostart" formats)
+    sed -i "/^${selected}$/d;/^${selected}:/d" "$CONFIG_FILE"
+    notify-send "Project Picker" "Deleted: $selected"
+}
+
+# Edit config in editor
+edit_config() {
+    # Try zed first, fall back to nvim in terminal
+    if command -v zed &>/dev/null; then
+        uwsm-app -- zed "$CONFIG_FILE"
+    elif command -v nvim &>/dev/null; then
+        uwsm-app -- ghostty -e nvim "$CONFIG_FILE"
+    else
+        uwsm-app -- ghostty -e nano "$CONFIG_FILE"
+    fi
+}
+
+# Main picker
+main() {
+    local selected
+    selected=$(build_menu | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "Project…" 2>/dev/null)
+
+    case "$selected" in
+        "$ACTION_NEW")
+            create_project
+            ;;
+        "$ACTION_DELETE")
+            delete_project
+            ;;
+        "$ACTION_EDIT")
+            edit_config
+            ;;
+        "$SEPARATOR"|"")
+            exit 0
+            ;;
+        *)
+            # Regular project selection
+            local idx
+            idx=$(get_projects | grep -n "^${selected}$" | cut -d: -f1)
+            if [[ -n "$idx" ]]; then
+                project-scratchpad-select "$idx"
+            fi
+            ;;
+    esac
+}
+
+main
