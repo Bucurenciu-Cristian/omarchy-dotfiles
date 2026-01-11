@@ -57,16 +57,21 @@ Moved from Ubuntu Server to Mac Mini to:
 ```bash
 UPLOAD_LOCATION=/Volumes/ImmichHDD/immich-data
 DB_PASSWORD=<stored in 1Password: "immich db password postgres mac mini">
+IMMICH_SERVER_URL=https://photos.devfusion-hub.ro  # Required for share links to use public proxy
 # Standard Immich vars for postgres, redis, etc.
 ```
+
+**Note:** Without `IMMICH_SERVER_URL`, share links use whatever URL you accessed Immich from (e.g., Tailscale internal address). Setting it ensures all share links point to the public Cloudflare URL regardless of how you access the app.
 
 ### Access URLs
 
 | URL | Port | Purpose |
 |-----|------|---------|
 | https://mac-mini.tail39ab0b.ts.net | 2283 | Private access (Tailscale) |
-| https://gallery.devfusion-hub.ro | 2283 | Public access (Cloudflare) |
-| https://photos.devfusion-hub.ro | 3000 | Public sharing proxy |
+| https://gallery.devfusion-hub.ro | 2283 | Full Immich UI (authenticated users) |
+| https://photos.devfusion-hub.ro | 3000 | Public sharing proxy (anonymous access) |
+
+**Public sharing setup:** The `photos` subdomain uses [immich-public-proxy](https://github.com/alangrainger/immich-public-proxy) - a lightweight proxy that allows anonymous access to shared albums without exposing the Immich login page or UI. Visitors see only the shared content.
 
 ### Docker Containers
 
@@ -76,7 +81,7 @@ DB_PASSWORD=<stored in 1Password: "immich db password postgres mac mini">
 | immich_machine_learning | Face/object detection |
 | immich_postgres | Database |
 | immich_redis | Cache |
-| immich_public_proxy | Public album sharing |
+| immich_public_proxy | Anonymous access to shared albums ([GitHub](https://github.com/alangrainger/immich-public-proxy)) |
 
 ### Cloudflare Tunnel
 

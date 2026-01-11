@@ -1,0 +1,10 @@
+bookmarks = [
+    "/home/kicky/dotfiles",
+    "/home/kicky/Work/tries",
+    "/home/kicky/work/06-resources/Script Neptun",
+    "/home/kicky/dev",
+]
+
+[[search_dirs]]
+path = "/home/kicky/dev"
+depth = 10

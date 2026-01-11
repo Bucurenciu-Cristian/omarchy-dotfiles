@@ -1,0 +1,11 @@
+brave-bin 1:1.85.120-1
+docker-desktop 4.55.0-1
+ggshield 1.45.0-1
+github-desktop-plus 3.5.5.3-1
+hyprdynamicmonitors-bin 1.4.0-1
+hyprmon-bin 0.0.12-1
+hyprsession 0.2.1-1
+ostt 0.0.5-1
+plex-media-server 1.42.2.10156-1
+stayfree-desktop 3.2.22-1
+termius 9.34.8-1
