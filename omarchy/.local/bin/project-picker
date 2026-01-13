@@ -33,34 +33,37 @@ prompt_input() {
     echo "" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "$prompt" 2>/dev/null
 }
 
-# Browse for directory using fzf in a floating terminal
+# Browse for directory using walker
 browse_directory() {
-    local temp_file
-    temp_file=$(mktemp /tmp/project-dir-XXXXXX)
+    # Find directories from common locations
+    local dirs=""
+    local search_paths=("$HOME/dev" "$HOME/projects" "$HOME/work")
 
-    # Launch floating terminal with fzf directory picker
-    # Use hyprctl to make window floating before it opens
-    ghostty \
-        --class="project-dir-picker" \
-        --title="Select Directory" \
-        -e project-dir-picker "$temp_file"
+    for path in "${search_paths[@]}"; do
+        if [[ -d "$path" ]]; then
+            dirs+=$(fd --type d --max-depth 3 --exclude .git --exclude node_modules --exclude .cache --exclude __pycache__ --exclude venv --exclude .venv . "$path" 2>/dev/null)
+            dirs+=$'\n'
+        fi
+    done
 
-    # Read result
-    local result=""
-    if [[ -f "$temp_file" ]]; then
-        result=$(cat "$temp_file")
-        rm -f "$temp_file"
-    fi
-
-    echo "$result"
+    # Filter, sort, and select with walker
+    echo "$dirs" | grep -v '^$' | sort -u | omarchy-launch-walker --dmenu --width 600 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "📂 Select directory:" 2>/dev/null
 }
 
 # Create new project
 create_project() {
-    local name
-    name=$(prompt_input "Project name:")
+    # Step 1: Select directory first (most important)
+    local project_dir
+    project_dir=$(browse_directory)
+    [[ -z "$project_dir" ]] && exit 0
 
-    [[ -z "$name" ]] && exit 0
+    # Step 2: Auto-suggest name from directory basename
+    local suggested_name
+    suggested_name=$(basename "$project_dir" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
+    local name
+    name=$(echo "$suggested_name" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "Project name:" 2>/dev/null)
+    [[ -z "$name" ]] && name="$suggested_name"
 
     # Validate: no pipes, alphanumeric + dashes/underscores
     if [[ ! "$name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
@@ -74,33 +77,27 @@ create_project() {
         exit 1
     fi
 
-    # Ask for tmux session name (default to project name)
-    local tmux_session
-    tmux_session=$(prompt_input "Tmux session name (default: $name):")
+    # Step 3: Check for existing tmux session or use directory name
+    local tmux_session="$name"
+
+    # Try to find existing tmux session that might match
+    local existing_sessions
+    existing_sessions=$(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)
+    if [[ -n "$existing_sessions" ]]; then
+        local matching
+        matching=$(echo "$existing_sessions" | grep -i "$(basename "$project_dir")" | head -1 || true)
+        if [[ -n "$matching" ]]; then
+            tmux_session="$matching"
+        fi
+    fi
+
+    # Confirm tmux session
+    tmux_session=$(echo "$tmux_session" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "Tmux session:" 2>/dev/null)
     [[ -z "$tmux_session" ]] && tmux_session="$name"
 
-    # Ask how to select directory
-    local dir_method
-    dir_method=$(printf "📂 Browse with fzf\n✏️ Type path manually" | omarchy-launch-walker --dmenu --width 300 --minheight 1 --maxheight 2 -p "Directory:" 2>/dev/null)
-
-    local project_dir=""
-    case "$dir_method" in
-        "📂 Browse with fzf")
-            project_dir=$(browse_directory)
-            ;;
-        "✏️ Type path manually")
-            project_dir=$(prompt_input "Project directory:")
-            ;;
-        *)
-            exit 0
-            ;;
-    esac
-
-    [[ -z "$project_dir" ]] && project_dir="$HOME"
-
-    # Append to config with new format: name|tmux_session|dir
+    # Create the project
     echo "${name}|${tmux_session}|${project_dir}" >> "$CONFIG_FILE"
-    notify-send "Project Picker" "Created: $name"
+    notify-send "Project Picker" "Created: $name → $tmux_session"
 
     # Switch to the new project
     project-scratchpad-select "$(get_projects | grep -n "^${name}$" | cut -d: -f1)"
