@@ -1,6 +1,6 @@
 #!/bin/bash
-# Project Scratchpad Selection (for submap use)
-# Called with a single number argument
+# Project Scratchpad Selection
+# Switches project context including tmux session
 
 set -euo pipefail
 
@@ -12,7 +12,7 @@ mkdir -p "$STATE_DIR"
 
 idx="$1"
 
-# Get the full line (may include autostart commands after colon)
+# Get the full line: project_name|tmux_session|dirs
 line=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
 
 if [[ -z "$line" ]]; then
@@ -20,27 +20,25 @@ if [[ -z "$line" ]]; then
     exit 1
 fi
 
-# Extract project name (before colon) and autostart commands (after colon)
-project=$(echo "$line" | cut -d: -f1)
-autostart=$(echo "$line" | grep ':' | cut -d: -f2- || true)
+# Parse the new format: project|tmux_session|dirs
+project=$(echo "$line" | cut -d'|' -f1)
+tmux_session=$(echo "$line" | cut -d'|' -f2)
+project_dir=$(echo "$line" | cut -d'|' -f3 | cut -d',' -f1)
 
 # Save current project
 echo "$project" > "$STATE_FILE"
 echo "1" > "$STATE_DIR/project-indicator-visible"
-notify-send "Project Mode" "Switched to: $project"
 
-# Run autostart commands if defined (only if not already running)
-if [[ -n "$autostart" ]]; then
-    IFS=';' read -ra cmds <<< "$autostart"
-    for cmd in "${cmds[@]}"; do
-        # Trim whitespace
-        cmd=$(echo "$cmd" | xargs)
-        if [[ -n "$cmd" ]]; then
-            # Extract app name (first word) to check if running
-            app=$(echo "$cmd" | awk '{print $1}')
-            if ! pgrep -f "$app" > /dev/null 2>&1; then
-                uwsm-app -- $cmd &
-            fi
-        fi
-    done
+# Switch tmux session if tmux is running and has clients attached
+if command -v tmux &> /dev/null && tmux list-clients &> /dev/null; then
+    # Check if target session exists
+    if tmux has-session -t "$tmux_session" 2>/dev/null; then
+        # Switch all attached clients to the new session
+        tmux switch-client -t "$tmux_session" 2>/dev/null || true
+    else
+        # Session doesn't exist - create it (will be used when terminal opens)
+        tmux new-session -d -s "$tmux_session" -c "$project_dir" 2>/dev/null || true
+    fi
 fi
+
+notify-send "Project Mode" "Switched to: $project"

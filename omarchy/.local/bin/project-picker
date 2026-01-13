@@ -13,9 +13,9 @@ ACTION_DELETE="🗑️ Delete project"
 ACTION_EDIT="✏️ Edit config"
 SEPARATOR="───────────────"
 
-# Extract just project names (before any colon for autostart)
+# Extract just project names (first field before pipe)
 get_projects() {
-    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d: -f1
+    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d'|' -f1
 }
 
 # Build menu with projects + actions
@@ -40,20 +40,30 @@ create_project() {
 
     [[ -z "$name" ]] && exit 0
 
-    # Validate: no spaces, no colons, alphanumeric + dashes/underscores
+    # Validate: no pipes, alphanumeric + dashes/underscores
     if [[ ! "$name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
         notify-send "Project Picker" "Invalid name. Use only letters, numbers, - and _"
         exit 1
     fi
 
     # Check if already exists
-    if grep -q "^${name}$\|^${name}:" "$CONFIG_FILE"; then
+    if grep -q "^${name}|" "$CONFIG_FILE"; then
         notify-send "Project Picker" "Project '$name' already exists"
         exit 1
     fi
 
-    # Append to config
-    echo "$name" >> "$CONFIG_FILE"
+    # Ask for tmux session name (default to project name)
+    local tmux_session
+    tmux_session=$(prompt_input "Tmux session name (default: $name):")
+    [[ -z "$tmux_session" ]] && tmux_session="$name"
+
+    # Ask for directory
+    local project_dir
+    project_dir=$(prompt_input "Project directory:")
+    [[ -z "$project_dir" ]] && project_dir="$HOME"
+
+    # Append to config with new format: name|tmux_session|dir
+    echo "${name}|${tmux_session}|${project_dir}" >> "$CONFIG_FILE"
     notify-send "Project Picker" "Created: $name"
 
     # Switch to the new project
@@ -78,8 +88,8 @@ delete_project() {
 
     [[ "$confirm" != "Yes, delete" ]] && exit 0
 
-    # Remove from config (handles both "project" and "project:autostart" formats)
-    sed -i "/^${selected}$/d;/^${selected}:/d" "$CONFIG_FILE"
+    # Remove from config (matches lines starting with "project|")
+    sed -i "/^${selected}|/d" "$CONFIG_FILE"
     notify-send "Project Picker" "Deleted: $selected"
 }
 
