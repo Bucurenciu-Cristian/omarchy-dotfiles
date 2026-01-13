@@ -1,6 +1,7 @@
 #!/bin/bash
 STATE_DIR="$HOME/.local/state/hyprland"
 VISIBLE_FILE="$STATE_DIR/project-indicator-visible"
+CONFIG_FILE="$HOME/.config/hypr/projects.conf"
 
 # Check if indicator should be visible
 visible=$(cat "$VISIBLE_FILE" 2>/dev/null || echo "0")
@@ -12,11 +13,15 @@ fi
 
 project=$(cat "$STATE_DIR/current-project" 2>/dev/null || echo "none")
 
+# Get project position (1-based index in config)
+position=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d'|' -f1 | grep -n "^${project}$" | cut -d: -f1)
+position=${position:-"?"}
+
 # Count windows in this project's scratchpad
 count=$(hyprctl clients -j | jq "[.[] | select(.workspace.name == \"special:project:$project\")] | length")
 
 if [[ "$count" -gt 0 ]]; then
-    echo "{\"text\": \"$project ($count)\", \"tooltip\": \"Project: $project - $count windows\", \"class\": \"$project\"}"
+    echo "{\"text\": \"${position}: ${project} (${count})\", \"tooltip\": \"Project ${position}: ${project} - ${count} windows\\nCtrl+Alt+${position} to switch\", \"class\": \"$project\"}"
 else
-    echo "{\"text\": \"$project\", \"tooltip\": \"Project: $project\", \"class\": \"$project\"}"
+    echo "{\"text\": \"${position}: ${project}\", \"tooltip\": \"Project ${position}: ${project}\\nCtrl+Alt+${position} to switch\", \"class\": \"$project\"}"
 fi
