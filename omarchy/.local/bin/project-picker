@@ -77,23 +77,15 @@ create_project() {
         exit 1
     fi
 
-    # Step 3: Check for existing tmux session or use directory name
+    # Auto-detect tmux session: look for existing session matching directory name
     local tmux_session="$name"
-
-    # Try to find existing tmux session that might match
     local existing_sessions
     existing_sessions=$(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)
     if [[ -n "$existing_sessions" ]]; then
         local matching
         matching=$(echo "$existing_sessions" | grep -i "$(basename "$project_dir")" | head -1 || true)
-        if [[ -n "$matching" ]]; then
-            tmux_session="$matching"
-        fi
+        [[ -n "$matching" ]] && tmux_session="$matching"
     fi
-
-    # Confirm tmux session
-    tmux_session=$(echo "$tmux_session" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "Tmux session:" 2>/dev/null)
-    [[ -z "$tmux_session" ]] && tmux_session="$name"
 
     # Create the project
     echo "${name}|${tmux_session}|${project_dir}" >> "$CONFIG_FILE"
