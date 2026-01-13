@@ -33,6 +33,28 @@ prompt_input() {
     echo "" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "$prompt" 2>/dev/null
 }
 
+# Browse for directory using fzf in a floating terminal
+browse_directory() {
+    local temp_file
+    temp_file=$(mktemp /tmp/project-dir-XXXXXX)
+
+    # Launch floating terminal with fzf directory picker
+    # Use hyprctl to make window floating before it opens
+    ghostty \
+        --class="project-dir-picker" \
+        --title="Select Directory" \
+        -e project-dir-picker "$temp_file"
+
+    # Read result
+    local result=""
+    if [[ -f "$temp_file" ]]; then
+        result=$(cat "$temp_file")
+        rm -f "$temp_file"
+    fi
+
+    echo "$result"
+}
+
 # Create new project
 create_project() {
     local name
@@ -57,9 +79,23 @@ create_project() {
     tmux_session=$(prompt_input "Tmux session name (default: $name):")
     [[ -z "$tmux_session" ]] && tmux_session="$name"
 
-    # Ask for directory
-    local project_dir
-    project_dir=$(prompt_input "Project directory:")
+    # Ask how to select directory
+    local dir_method
+    dir_method=$(printf "📂 Browse with fzf\n✏️ Type path manually" | omarchy-launch-walker --dmenu --width 300 --minheight 1 --maxheight 2 -p "Directory:" 2>/dev/null)
+
+    local project_dir=""
+    case "$dir_method" in
+        "📂 Browse with fzf")
+            project_dir=$(browse_directory)
+            ;;
+        "✏️ Type path manually")
+            project_dir=$(prompt_input "Project directory:")
+            ;;
+        *)
+            exit 0
+            ;;
+    esac
+
     [[ -z "$project_dir" ]] && project_dir="$HOME"
 
     # Append to config with new format: name|tmux_session|dir
