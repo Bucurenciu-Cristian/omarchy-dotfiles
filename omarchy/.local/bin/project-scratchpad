@@ -68,6 +68,21 @@ send_to_scratchpad() {
     hyprctl dispatch movetoworkspacesilent "special:project:$project"
 }
 
+# Send current window to specific project by index (without switching)
+send_to_project_by_index() {
+    local idx="$1"
+    local line
+    line=$(grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | sed -n "${idx}p")
+
+    if [[ -z "$line" ]]; then
+        notify-send "Project Scratchpad" "Invalid project index: $idx"
+        exit 1
+    fi
+
+    local project=$(echo "$line" | cut -d: -f1)
+    hyprctl dispatch movetoworkspacesilent "special:project:$project"
+}
+
 # Show current project
 show_current() {
     local project
@@ -83,6 +98,9 @@ case "${1:-toggle}" in
     send)
         send_to_scratchpad
         ;;
+    send-to)
+        send_to_project_by_index "${2:-1}"
+        ;;
     set)
         set_project_by_index "${2:-1}"
         ;;
@@ -96,7 +114,7 @@ case "${1:-toggle}" in
         list_projects
         ;;
     *)
-        echo "Usage: project-scratchpad [toggle|send|set <index>|current|show|list]"
+        echo "Usage: project-scratchpad [toggle|send|send-to <index>|set <index>|current|show|list]"
         exit 1
         ;;
 esac
