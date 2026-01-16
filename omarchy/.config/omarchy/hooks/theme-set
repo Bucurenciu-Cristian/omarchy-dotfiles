@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Override swaybg to use 'fit' mode for 21:9 ultrawide monitors
+# This preserves aspect ratio instead of stretching
+
+CURRENT_BACKGROUND_LINK="$HOME/.config/omarchy/current/background"
+
+if [[ -L "$CURRENT_BACKGROUND_LINK" ]]; then
+  pkill -x swaybg
+  setsid uwsm-app -- swaybg -i "$CURRENT_BACKGROUND_LINK" -m fit >/dev/null 2>&1 &
+fi
