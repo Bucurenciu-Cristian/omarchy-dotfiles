@@ -1,4 +1,7 @@
 {
+  "session": {
+    "trust_all_worktrees": true
+  },
   "autosave": "on_window_change",
   "base_keymap": "JetBrains",
   "context_servers": {

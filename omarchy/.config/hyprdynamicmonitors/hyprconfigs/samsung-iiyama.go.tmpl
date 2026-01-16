@@ -1,0 +1,30 @@
+{{- $samsung := index .MonitorsByTag "samsung" -}}
+{{- $iiyama := index .MonitorsByTag "iiyama" -}}
+# Dual External: Samsung (left) + iiyama (right)
+# Samsung: {{$samsung.Description}} via {{$samsung.Name}}
+# iiyama: {{$iiyama.Description}} via {{$iiyama.Name}}
+# Power: {{.PowerState}}
+
+# Samsung (left) - 1920x1080
+monitor={{$samsung.Name}},1920x1080@{{if isOnAC}}120{{else}}60{{end}},0x0,1.0
+
+# iiyama (right) - 3440x1440 at 125% scale, positioned after Samsung's width
+monitor={{$iiyama.Name}},3440x1440@{{if isOnAC}}179.98{{else}}60{{end}},1920x0,1.25
+
+# Laptop disabled
+monitor=eDP-1,disable
+
+# All workspaces on iiyama
+workspace = 1,monitor:{{$iiyama.Name}},default:true
+workspace = 2,monitor:{{$iiyama.Name}}
+workspace = 3,monitor:{{$iiyama.Name}}
+workspace = 4,monitor:{{$iiyama.Name}}
+workspace = 5,monitor:{{$iiyama.Name}}
+workspace = 6,monitor:{{$iiyama.Name}}
+workspace = 7,monitor:{{$iiyama.Name}}
+workspace = 8,monitor:{{$iiyama.Name}}
+workspace = 9,monitor:{{$iiyama.Name}}
+workspace = 10,monitor:{{$iiyama.Name}}
+
+# Special workspace for movies on Samsung
+workspace = special:movies,monitor:{{$samsung.Name}}
