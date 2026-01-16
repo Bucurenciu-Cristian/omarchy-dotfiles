@@ -1,0 +1,11 @@
+brave-bin
+docker-desktop
+ggshield
+github-desktop-plus
+hyprdynamicmonitors-bin
+hyprmon-bin
+hyprsession
+ostt
+plex-media-server
+stayfree-desktop
+termius
