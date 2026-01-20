@@ -23,6 +23,19 @@ export PATH="/home/kicky/.cache/.bun/bin:$PATH"
 alias superset='/home/kicky/dev/superset/apps/desktop/release/superset-0.0.3-x86_64.AppImage'
 alias suspend="systemctl suspend"
 
+# Power profile toggle (power-saver ↔ performance)
+power() {
+    local current=$(powerprofilesctl get)
+    case "${1:-toggle}" in
+        s|saver)  powerprofilesctl set power-saver ;;
+        p|perf)   powerprofilesctl set performance ;;
+        b|bal)    powerprofilesctl set balanced ;;
+        toggle|t) [[ "$current" == "power-saver" ]] && powerprofilesctl set performance || powerprofilesctl set power-saver ;;
+        *)        powerprofilesctl ;;
+    esac
+    echo "→ $(powerprofilesctl get)"
+}
+
 # YOLO aliases - skip permission prompts (use with care)
 alias cc='claude --dangerously-skip-permissions'
 alias cc-start='claude --dangerously-skip-permissions'
