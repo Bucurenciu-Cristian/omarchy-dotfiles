@@ -92,7 +92,7 @@ create_project() {
     notify-send "Project Picker" "Created: $name → $tmux_session"
 
     # Switch to the new project
-    project-scratchpad-select "$(get_projects | grep -n "^${name}$" | cut -d: -f1)"
+    $HOME/.local/bin/project-scratchpad-select "$(get_projects | grep -n "^${name}$" | cut -d: -f1)"
 }
 
 # Delete project
@@ -153,7 +153,7 @@ main() {
             local idx
             idx=$(get_projects | grep -n "^${selected}$" | cut -d: -f1)
             if [[ -n "$idx" ]]; then
-                project-scratchpad-select "$idx"
+                $HOME/.local/bin/project-scratchpad-select "$idx"
             fi
             ;;
     esac

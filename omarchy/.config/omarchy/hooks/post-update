@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Post-update hook - runs after omarchy-update completes
+# Add any tasks you want to run automatically after updates
+
+# Sync tmux plugins
+if command -v tmux &>/dev/null && [[ -d ~/.tmux/plugins/tpm ]]; then
+    ~/.tmux/plugins/tpm/bin/install_plugins >/dev/null 2>&1
+    echo "✓ Tmux plugins synced"
+fi
+
+# Update mise tools
+if command -v mise &>/dev/null; then
+    mise upgrade --yes >/dev/null 2>&1
+    echo "✓ Mise tools updated"
+fi
+
+# Notify completion
+notify-send "Omarchy Update" "Post-update tasks completed" -t 3000

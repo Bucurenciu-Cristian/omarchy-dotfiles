@@ -46,3 +46,15 @@
 	format = ssh
 [gpg "ssh"]
 	program = /opt/1Password/op-ssh-sign
+[core]
+	pager = delta
+	hooksPath = /home/kicky/dotfiles/.git_hooks
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true          # Use n/N to jump between diff sections
+	side-by-side = true      # Side-by-side view
+	line-numbers = true      # Show line numbers
+	syntax-theme = gruvbox-dark
+[merge]
+	conflictstyle = zdiff3   # Better conflict markers

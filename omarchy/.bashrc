@@ -13,17 +13,22 @@ source ~/.local/share/omarchy/default/bash/rc
 # Refresh monitor detection (useful when switching external monitors)
 alias monitors='kill -SIGHUP $(pidof hyprdynamicmonitors) 2>/dev/null || hyprdynamicmonitors run --run-once'
 
-. "$HOME/.local/share/../bin/env"
-. "$HOME/.cargo/env"
-export PATH=$HOME/.local/bin:$PATH
+# Note: PATH is set in ~/.config/uwsm/env for session-wide availability
+# ~/.local/bin and ~/.cargo/bin are already in PATH from uwsm
 
 # 1Password SSH agent
 export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 
 export PATH="/home/kicky/.cache/.bun/bin:$PATH"
 alias superset='/home/kicky/dev/superset/apps/desktop/release/superset-0.0.3-x86_64.AppImage'
-alias claude="claude --dangerously-skip-permissions"
 alias suspend="systemctl suspend"
+
+# YOLO aliases - skip permission prompts (use with care)
+alias cc='claude --dangerously-skip-permissions'
+alias cc-start='claude --dangerously-skip-permissions'
+alias cc-continue='claude --dangerously-skip-permissions --continue'
+alias codex-start='codex --dangerously-bypass-approvals-and-sandbox'
+alias codex-continue='codex --dangerously-bypass-approvals-and-sandbox --continue'
 
 # opcode alias
 alias opcode="/home/kicky/Work/tries/2025-12-13-opcode/opcode/src-tauri/target/release/opcode"
@@ -38,7 +43,7 @@ esac
 
 # Neptune sauna booking script
 neptun() {
-    local project_dir="$HOME/work/06-resources/Script Neptun"
+    local project_dir="$HOME/dev/neptun"
     if [[ $# -eq 0 ]]; then
         echo "Usage: neptun <command>"
         echo ""
@@ -53,3 +58,41 @@ neptun() {
     fi
     make -C "$project_dir" "$@"
 }
+
+# ============================================
+# MODERN CLI TOOLS (mise-managed)
+# ============================================
+# Replace default commands with better alternatives
+alias ls='eza --icons'
+alias ll='eza -la --icons --git'
+alias la='eza -a --icons'
+alias lt='eza --tree --icons --level=2'
+alias cat='bat --paging=never'
+alias grep='rg'
+alias find='fd'
+
+# Keep originals accessible
+alias ols='/usr/bin/ls'
+alias ocat='/usr/bin/cat'
+alias ogrep='/usr/bin/grep'
+alias ofind='/usr/bin/find'
+
+# Handy shortcuts
+alias lg='lazygit'
+alias diff='delta'
+alias zed='zeditor'
+
+# ============================================
+# FZF CONFIGURATION
+# ============================================
+# Use fd for faster file finding
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+# Better fzf appearance
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --info=inline'
+
+# Load fzf keybindings (Ctrl+R for history, Ctrl+T for files, Alt+C for cd)
+eval "$(fzf --bash)"
+

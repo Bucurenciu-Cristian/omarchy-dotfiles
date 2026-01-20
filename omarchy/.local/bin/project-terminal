@@ -5,9 +5,9 @@
 set -euo pipefail
 
 # Get current project info
-PROJECT=$(project-scratchpad current)
-TMUX_SESSION=$(project-scratchpad tmux-session)
-PROJECT_DIR=$(project-scratchpad dir)
+PROJECT=$($HOME/.local/bin/project-scratchpad current)
+TMUX_SESSION=$($HOME/.local/bin/project-scratchpad tmux-session)
+PROJECT_DIR=$($HOME/.local/bin/project-scratchpad dir)
 
 # Check if tmux session exists
 if tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then

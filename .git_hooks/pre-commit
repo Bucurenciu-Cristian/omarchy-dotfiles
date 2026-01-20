@@ -1,0 +1,11 @@
+#!/bin/sh
+# ABOUTME: Global pre-commit hook that runs pre-commit framework if configured
+# ABOUTME: Skips gracefully if no .pre-commit-config.yaml exists in the repo
+
+# Check if we're in a git repo with pre-commit config
+if [ -f "$(git rev-parse --show-toplevel 2>/dev/null)/.pre-commit-config.yaml" ]; then
+    # Try pre-commit if available
+    if command -v pre-commit >/dev/null 2>&1; then
+        cd "$(git rev-parse --show-toplevel)" && pre-commit run --hook-stage pre-commit
+    fi
+fi

@@ -1,5 +1,18 @@
 {
   "env": {},
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/append_ultrathink.py"
+          }
+        ]
+      }
+    ]
+  },
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -62,7 +75,8 @@
     "hookify@claude-plugins-official": true,
     "double-shot-latte@superpowers-marketplace": true,
     "explanatory-output-style@claude-plugins-official": true,
-    "changelog-generator@awesome-claude-skills": true
+    "changelog-generator@awesome-claude-skills": true,
+    "superpowers@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true
 }

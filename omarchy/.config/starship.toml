@@ -1,6 +1,6 @@
 add_newline = true
 command_timeout = 200
-format = "${custom.flux_db_prod}${custom.flux_db_local}[$directory$git_branch$git_status]($style)$character"
+format = "${custom.flux_db_prod}${custom.flux_db_local}${custom.cityfm_db_prod}${custom.cityfm_db_local}[$directory$git_branch$git_status]($style)$character"
 
 [character]
 error_symbol = "[✗](bold cyan)"
@@ -44,5 +44,18 @@ style = "bold red"
 [custom.flux_db_local]
 command = "echo '[LOCAL]'"
 when = "pwd | grep -q '/home/kicky/dev/flux_app' && { ! test -f /home/kicky/dev/flux_app/.db-environment || grep -q 'LOCAL' /home/kicky/dev/flux_app/.db-environment; }"
+format = "[$output]($style) "
+style = "bold green"
+
+# City FM database environment indicator
+[custom.cityfm_db_prod]
+command = "echo '[PROD]'"
+when = "pwd | grep -q '/home/kicky/dev/city-fm/city-fm-website' && test -f /home/kicky/dev/city-fm/city-fm-website/.db-environment && grep -q 'REMOTE' /home/kicky/dev/city-fm/city-fm-website/.db-environment"
+format = "[$output]($style) "
+style = "bold red"
+
+[custom.cityfm_db_local]
+command = "echo '[LOCAL]'"
+when = "pwd | grep -q '/home/kicky/dev/city-fm/city-fm-website' && { ! test -f /home/kicky/dev/city-fm/city-fm-website/.db-environment || grep -q 'LOCAL' /home/kicky/dev/city-fm/city-fm-website/.db-environment; }"
 format = "[$output]($style) "
 style = "bold green"

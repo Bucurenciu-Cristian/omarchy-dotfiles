@@ -1,0 +1,81 @@
+#!/bin/bash
+# ABOUTME: Git hook that auto-generates commit messages using LLM
+# ABOUTME: Pipes git diff to llm CLI with a system prompt for message generation
+
+# Exit if SKIP_LLM_GITHOOK is set
+if [ -n "$SKIP_LLM_GITHOOK" ]; then
+    exit 0
+fi
+
+# ANSI colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Spinner animation while LLM processes
+spin_animation() {
+    spinner=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+    while true; do
+        for i in "${spinner[@]}"; do
+            tput civis
+            tput el1
+            printf "\\r${YELLOW}%s${NC} Generating LLM commit message..." "$i"
+            sleep 0.1
+            tput cub 32
+        done
+    done
+}
+
+# Skip for merge commits (has second argument)
+if [ -n "$2" ]; then
+    exit 0
+fi
+
+# Check if llm is installed
+if ! command -v llm &> /dev/null; then
+    echo -e "${YELLOW}Note: 'llm' not installed. Install with: uv tool install llm${NC}"
+    exit 0  # Don't block commit, just skip
+fi
+
+# Check if prompt file exists
+PROMPT_FILE="$HOME/.config/prompts/commit-system-prompt.txt"
+if [ ! -f "$PROMPT_FILE" ]; then
+    echo -e "${YELLOW}Note: Prompt file not found at $PROMPT_FILE${NC}"
+    exit 0
+fi
+
+# Check if there are staged changes
+if git diff --cached --quiet; then
+    exit 0  # No changes staged, skip
+fi
+
+# Start spinner
+spin_animation &
+spin_pid=$!
+
+# Generate commit message
+if ! commit_msg=$(git diff -U999999 --cached | llm -s "$(cat "$PROMPT_FILE")" 2>&1); then
+    kill $spin_pid 2>/dev/null
+    wait $spin_pid 2>/dev/null
+    tput cnorm
+    printf "\\n"
+    printf "${RED}Error: LLM failed:\\n${commit_msg}${NC}\\n\\nWrite commit message manually.\\n"
+    exit 0  # Don't block, let user write manually
+fi
+
+# Stop spinner
+kill $spin_pid 2>/dev/null
+wait $spin_pid 2>/dev/null
+tput cnorm
+echo
+
+# Display generated message
+echo -e "${BLUE}=== Generated Commit Message ===${NC}"
+echo -e "${GREEN}$commit_msg${NC}"
+echo -e "${BLUE}=================================${NC}"
+echo
+
+# Write to commit message file
+echo "$commit_msg" > "$1"
