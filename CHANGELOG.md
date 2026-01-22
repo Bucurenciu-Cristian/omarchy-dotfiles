@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-01-22 (evening)
+
+- **Claude Code Hooks** - Auto-format files on Write/Edit
+  - New `post-write-format.sh` hook formats Python (ruff/black), Go, JS/TS (prettier/eslint), JSON, YAML, Lua, Rust, and shell scripts
+  - Runs automatically after Claude creates or edits files
+- **Claude Code Permissions** - Expanded allowlist
+  - Tools: uv, uvx, pnpm, cargo, rustc, gh, systemctl, journalctl, stow
+  - All superpowers skills pre-approved
+  - WebFetch for common documentation sites (Arch Wiki, Hyprland, Payload, Supabase, Next.js, etc.)
+  - Added superpowers-dev marketplace (disabled by default)
+- **Project Picker** - Major workflow improvements
+  - Project status: active (●) vs pending (○) with toggle action
+  - Active projects shown first, pending grouped below
+  - "No folder yet" option for projects without directories
+  - Custom path entry option in directory browser
+  - Directory fallback to `~/dev` when path doesn't exist
+- **Neovim Plugins** - Update lazy-lock.json (gitsigns, grug-far, neo-tree, treesitter, lspconfig updates; added cobalt2/colorbuddy themes)
+
 ## 2026-01-22
 
 - **hyprdynamicmonitors** - Add ASUS + iiyama dual ultrawide profile

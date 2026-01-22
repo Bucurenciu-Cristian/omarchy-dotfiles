@@ -59,11 +59,16 @@ get_project_dir() {
     local line
     line=$(get_project_line "$project")
     if [[ -n "$line" ]]; then
-        local dirs
-        dirs=$(get_config_field "$line" 3)
-        echo "$dirs" | cut -d',' -f1
+        local dir
+        dir=$(get_config_field "$line" 3 | cut -d',' -f1)
+        # Fallback to ~/dev if directory doesn't exist
+        if [[ -d "$dir" ]]; then
+            echo "$dir"
+        else
+            echo "$HOME/dev"
+        fi
     else
-        echo "$HOME"  # fallback
+        echo "$HOME/dev"  # fallback
     fi
 }
 

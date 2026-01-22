@@ -1,6 +1,35 @@
 {
   "env": {},
-  "hooks": {},
+  "extraKnownMarketplaces": {
+    "superpowers-dev": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers"
+      }
+    }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-write-format.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-write-format.sh"
+          }
+        ]
+      }
+    ]
+  },
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -35,7 +64,55 @@
       "Bash(python:*)",
       "Bash(python3:*)",
       "Update(*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(uv:*)",
+      "Bash(uvx:*)",
+      "Bash(pnpm:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(gh:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(wc:*)",
+      "Bash(date:*)",
+      "Bash(systemctl:*)",
+      "Bash(journalctl:*)",
+      "Bash(stow:*)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:dispatching-parallel-agents)",
+      "Skill(superpowers:executing-plans)",
+      "Skill(superpowers:finishing-a-development-branch)",
+      "Skill(superpowers:receiving-code-review)",
+      "Skill(superpowers:requesting-code-review)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Skill(superpowers:systematic-debugging)",
+      "Skill(superpowers:test-driven-development)",
+      "Skill(superpowers:using-git-worktrees)",
+      "Skill(superpowers:using-superpowers)",
+      "Skill(superpowers:verification-before-completion)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:writing-skills)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:docs.claude.ai)",
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:docs.aws.amazon.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:go.dev)",
+      "WebFetch(domain:pkg.go.dev)",
+      "WebFetch(domain:wiki.archlinux.org)",
+      "WebFetch(domain:wiki.hyprland.org)",
+      "WebFetch(domain:payloadcms.com)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:nextjs.org)",
+      "WebFetch(domain:tailwindcss.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebSearch"
     ],
     "deny": []
   },
@@ -46,6 +123,7 @@
   },
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true,
+    "superpowers@superpowers-dev": false,
     "superpowers-chrome@superpowers-marketplace": true,
     "frontend-design@claude-plugins-official": true,
     "superpowers-lab@superpowers-marketplace": true,

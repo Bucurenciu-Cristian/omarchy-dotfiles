@@ -9,20 +9,53 @@ WALKER_HEIGHT=$((SCREEN_HEIGHT * 80 / 100))
 
 # Menu actions
 ACTION_NEW="➕ New project"
+ACTION_TOGGLE="🔄 Toggle status"
 ACTION_DELETE="🗑️ Delete project"
 ACTION_EDIT="✏️ Edit config"
 SEPARATOR="───────────────"
+
+# Status indicators
+STATUS_ACTIVE="●"
+STATUS_PENDING="○"
 
 # Extract just project names (first field before pipe)
 get_projects() {
     grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | cut -d'|' -f1
 }
 
+# Get projects with status, grouped: Active first, then Pending
+# Config format: name|session|dir|status (status defaults to "active" if missing)
+get_projects_with_status() {
+    local active=""
+    local pending=""
+
+    while IFS='|' read -r name session dir status; do
+        [[ -z "$name" ]] && continue
+        # Default to "active" if status field is missing (backwards compat)
+        [[ -z "$status" ]] && status="active"
+        if [[ "$status" == "active" ]]; then
+            active+="$STATUS_ACTIVE $name"$'\n'
+        else
+            pending+="$STATUS_PENDING $name"$'\n'
+        fi
+    done < <(grep -v '^#' "$CONFIG_FILE" | grep -v '^$')
+
+    # Output Active first, then Pending (no headers, just grouped)
+    echo -n "$active"
+    echo -n "$pending"
+}
+
+# Extract project name from status-prefixed selection
+strip_status() {
+    echo "$1" | sed 's/^[●○] //'
+}
+
 # Build menu with projects + actions
 build_menu() {
-    get_projects
+    get_projects_with_status
     echo "$SEPARATOR"
     echo "$ACTION_NEW"
+    echo "$ACTION_TOGGLE"
     echo "$ACTION_DELETE"
     echo "$ACTION_EDIT"
 }
@@ -32,6 +65,10 @@ prompt_input() {
     local prompt="$1"
     echo "" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "$prompt" 2>/dev/null
 }
+
+# Special directory options
+DIR_CUSTOM="📝 Enter custom path"
+DIR_NONE="🚀 No folder yet"
 
 # Browse for directory using walker
 browse_directory() {
@@ -46,20 +83,48 @@ browse_directory() {
         fi
     done
 
-    # Filter, sort, and select with walker
-    echo "$dirs" | grep -v '^$' | sort -u | omarchy-launch-walker --dmenu --width 600 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "📂 Select directory:" 2>/dev/null
+    # Add special options at the top, then existing directories
+    {
+        echo "$DIR_CUSTOM"
+        echo "$DIR_NONE"
+        echo "$SEPARATOR"
+        echo "$dirs" | grep -v '^$' | sort -u
+    } | omarchy-launch-walker --dmenu --width 600 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "📂 Select directory:" 2>/dev/null
 }
 
 # Create new project
 create_project() {
-    # Step 1: Select directory first (most important)
+    # Step 1: Select directory (or special option)
     local project_dir
-    project_dir=$(browse_directory)
-    [[ -z "$project_dir" ]] && exit 0
+    local selection
+    selection=$(browse_directory)
+    [[ -z "$selection" || "$selection" == "$SEPARATOR" ]] && exit 0
 
-    # Step 2: Auto-suggest name from directory basename
+    # Handle special options
+    case "$selection" in
+        "$DIR_CUSTOM")
+            # Prompt for custom path
+            project_dir=$(prompt_input "Enter path:")
+            [[ -z "$project_dir" ]] && exit 0
+            # Expand ~ to home directory
+            project_dir="${project_dir/#\~/$HOME}"
+            ;;
+        "$DIR_NONE")
+            # Use ~/dev as placeholder
+            project_dir="$HOME/dev"
+            ;;
+        *)
+            project_dir="$selection"
+            ;;
+    esac
+
+    # Step 2: Auto-suggest name from directory basename (or prompt if ~/dev placeholder)
     local suggested_name
-    suggested_name=$(basename "$project_dir" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+    if [[ "$selection" == "$DIR_NONE" ]]; then
+        suggested_name=""
+    else
+        suggested_name=$(basename "$project_dir" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+    fi
 
     local name
     name=$(echo "$suggested_name" | omarchy-launch-walker --dmenu --width 400 --minheight 1 --maxheight 1 -p "Project name:" 2>/dev/null)
@@ -87,8 +152,8 @@ create_project() {
         [[ -n "$matching" ]] && tmux_session="$matching"
     fi
 
-    # Create the project
-    echo "${name}|${tmux_session}|${project_dir}" >> "$CONFIG_FILE"
+    # Create the project (default status: active)
+    echo "${name}|${tmux_session}|${project_dir}|active" >> "$CONFIG_FILE"
     notify-send "Project Picker" "Created: $name → $tmux_session"
 
     # Switch to the new project
@@ -98,7 +163,7 @@ create_project() {
 # Delete project
 delete_project() {
     local projects
-    projects=$(get_projects)
+    projects=$(get_projects_with_status)
 
     [[ -z "$projects" ]] && notify-send "Project Picker" "No projects to delete" && exit 0
 
@@ -107,15 +172,65 @@ delete_project() {
 
     [[ -z "$selected" ]] && exit 0
 
+    # Strip status prefix
+    local project_name
+    project_name=$(strip_status "$selected")
+
     # Confirm deletion
     local confirm
-    confirm=$(printf "Yes, delete\nNo, cancel" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 2 -p "Delete '$selected'?" 2>/dev/null)
+    confirm=$(printf "Yes, delete\nNo, cancel" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 2 -p "Delete '$project_name'?" 2>/dev/null)
 
     [[ "$confirm" != "Yes, delete" ]] && exit 0
 
     # Remove from config (matches lines starting with "project|")
-    sed -i "/^${selected}|/d" "$CONFIG_FILE"
-    notify-send "Project Picker" "Deleted: $selected"
+    sed -i "/^${project_name}|/d" "$CONFIG_FILE"
+    notify-send "Project Picker" "Deleted: $project_name"
+}
+
+# Toggle project status between active/pending
+toggle_status() {
+    local projects
+    projects=$(get_projects_with_status)
+
+    [[ -z "$projects" ]] && notify-send "Project Picker" "No projects" && exit 0
+
+    local selected
+    selected=$(echo "$projects" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight "$WALKER_HEIGHT" -p "Toggle which?" 2>/dev/null)
+
+    [[ -z "$selected" ]] && exit 0
+
+    # Strip status prefix to get project name
+    local project_name
+    project_name=$(strip_status "$selected")
+
+    # Get current line and determine new status
+    local current_line
+    current_line=$(grep "^${project_name}|" "$CONFIG_FILE")
+    [[ -z "$current_line" ]] && exit 1
+
+    # Parse current status (field 4, default to "active")
+    local current_status
+    current_status=$(echo "$current_line" | cut -d'|' -f4)
+    [[ -z "$current_status" ]] && current_status="active"
+
+    # Toggle status
+    local new_status
+    if [[ "$current_status" == "active" ]]; then
+        new_status="pending"
+    else
+        new_status="active"
+    fi
+
+    # Build new line with updated status
+    local name session dir
+    name=$(echo "$current_line" | cut -d'|' -f1)
+    session=$(echo "$current_line" | cut -d'|' -f2)
+    dir=$(echo "$current_line" | cut -d'|' -f3)
+    local new_line="${name}|${session}|${dir}|${new_status}"
+
+    # Replace in config (use # as delimiter to avoid escaping pipes)
+    sed -i "s#^${project_name}|.*#${new_line}#" "$CONFIG_FILE"
+    notify-send "Project Picker" "$project_name → $new_status"
 }
 
 # Edit config in editor
@@ -139,6 +254,9 @@ main() {
         "$ACTION_NEW")
             create_project
             ;;
+        "$ACTION_TOGGLE")
+            toggle_status
+            ;;
         "$ACTION_DELETE")
             delete_project
             ;;
@@ -149,9 +267,11 @@ main() {
             exit 0
             ;;
         *)
-            # Regular project selection
+            # Regular project selection - strip status prefix first
+            local project_name
+            project_name=$(strip_status "$selected")
             local idx
-            idx=$(get_projects | grep -n "^${selected}$" | cut -d: -f1)
+            idx=$(get_projects | grep -n "^${project_name}$" | cut -d: -f1)
             if [[ -n "$idx" ]]; then
                 $HOME/.local/bin/project-scratchpad-select "$idx"
             fi
