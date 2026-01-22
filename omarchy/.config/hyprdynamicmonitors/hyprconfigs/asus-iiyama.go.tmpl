@@ -1,0 +1,16 @@
+{{- $asus := index .MonitorsByTag "asus" -}}
+{{- $iiyama := index .MonitorsByTag "iiyama" -}}
+# Dual External: ASUS (top) + iiyama (below)
+# ASUS: {{$asus.Description}} via {{$asus.Name}}
+# iiyama: {{$iiyama.Description}} via {{$iiyama.Name}}
+# Power: {{.PowerState}}
+
+# ASUS (top) - 3440x1440 at 100Hz, 125% scale
+monitor={{$asus.Name}},3440x1440@{{if isOnAC}}100{{else}}60{{end}},0x0,1.25
+
+# iiyama (below) - 3440x1440 at 180Hz, 125% scale, positioned below ASUS
+# Position: 0x1152 = ASUS logical height (1440/1.25) for seamless cursor movement
+monitor={{$iiyama.Name}},3440x1440@{{if isOnAC}}179.98{{else}}60{{end}},0x1152,1.25
+
+# Laptop disabled
+monitor=eDP-1,disable

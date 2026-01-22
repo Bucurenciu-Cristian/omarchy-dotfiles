@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-01-22
+
+- **hyprdynamicmonitors** - Add ASUS + iiyama dual ultrawide profile
+  - New `asus-iiyama` profile with ASUS on top, iiyama below
+  - Template with stacked positioning and dynamic refresh rates
+- **tmux** - Fix continuum auto-save with pane-focus-in hook (PowerKit workaround)
+- **Claude Code** - Remove ultrathink hook, add `claude` full alias
+- **laptop.conf** - Document all scale options for 2880x1920 panel
+- **Serena** - Add Claude Code setup enhancements memory
+
 ## 2026-01-09
 
 - **System Replication Guide** - Complete documentation for reproducing this setup

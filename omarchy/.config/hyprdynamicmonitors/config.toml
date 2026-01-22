@@ -27,6 +27,19 @@ description = "VG34VQ"
 match_description_using_regex = true
 monitor_tag = "asus"
 
+# Dual external: ASUS + iiyama (ASUS on top, iiyama below)
+[profiles.asus-iiyama]
+config_file = "hyprconfigs/asus-iiyama.go.tmpl"
+config_file_type = "template"
+[[profiles.asus-iiyama.conditions.required_monitors]]
+description = "VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
+[[profiles.asus-iiyama.conditions.required_monitors]]
+description = "PL3481WQ"
+match_description_using_regex = true
+monitor_tag = "iiyama"
+
 # Dual external: Samsung + iiyama (must be before individual profiles)
 [profiles.samsung-iiyama]
 config_file = "hyprconfigs/samsung-iiyama.go.tmpl"

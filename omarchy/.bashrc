@@ -37,6 +37,7 @@ power() {
 }
 
 # YOLO aliases - skip permission prompts (use with care)
+alias claude='claude --dangerously-skip-permissions'
 alias cc='claude --dangerously-skip-permissions'
 alias cc-start='claude --dangerously-skip-permissions'
 alias cc-continue='claude --dangerously-skip-permissions --continue'
