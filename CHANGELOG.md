@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-01-22 (night)
+
+- **bashrc** - Add dotfiles sync aliases
+  - `dotfiles-sync` / `ds` - Start sync service and follow logs
+
 ## 2026-01-22 (evening)
 
 - **Claude Code Hooks** - Auto-format files on Write/Edit

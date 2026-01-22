@@ -44,6 +44,10 @@ alias cc-continue='claude --dangerously-skip-permissions --continue'
 alias codex-start='codex --dangerously-bypass-approvals-and-sandbox'
 alias codex-continue='codex --dangerously-bypass-approvals-and-sandbox --continue'
 
+# Dotfiles sync (Claude headless)
+alias dotfiles-sync='systemctl --user start dotfiles-auto-sync.service && journalctl --user -u dotfiles-auto-sync.service -f'
+alias ds='dotfiles-sync'
+
 # opcode alias
 alias opcode="/home/kicky/Work/tries/2025-12-13-opcode/opcode/src-tauri/target/release/opcode"
 
