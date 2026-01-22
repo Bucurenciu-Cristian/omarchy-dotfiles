@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily dotfiles auto-sync timer
+
+[Timer]
+# Run daily at 9 PM
+OnCalendar=*-*-* 21:00:00
+# Run missed jobs if system was off
+Persistent=true
+# Randomize within 30 min to avoid exact timing
+RandomizedDelaySec=1800
+
+[Install]
+WantedBy=timers.target

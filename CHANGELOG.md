@@ -9,6 +9,33 @@
 - **Claude Code** - Remove ultrathink hook, add `claude` full alias
 - **laptop.conf** - Document all scale options for 2880x1920 panel
 - **Serena** - Add Claude Code setup enhancements memory
+- **Automation** - Add headless Claude dotfiles sync system
+  - `dotfiles-auto-sync` script with changelog updates, commit, push
+  - `tmux-auto-save` script for session persistence
+  - Systemd timers: daily dotfiles sync (9 PM), tmux save (15 min)
+  - Logging to `~/.local/share/dotfiles-sync/sync.log`
+
+## 2026-01-20
+
+- **Claude Code Commands** - Three new slash commands
+  - `/careful-review` - Fresh eyes code review using subagent
+  - `/find-missing-tests` - Audit and create GitHub issues for missing tests
+  - `/session-summary` - Generate session recap with cost and efficiency insights
+- **Claude Code Skills** - Three workflow automation skills
+  - `releasing-software` - Pre-flight checklist prevents retag-four-times pattern
+  - `production-readiness` - Local dev setup, migrations, environment switching
+  - `client-feedback-chat` - WhatsApp/messaging tracking in chat.md
+- **Claude Code Docs** - Four reference documents
+  - `python.md` - uv preferences
+  - `docker-uv.md` - Multistage Dockerfile patterns
+  - `source-control.md` - Commit message standards
+  - `using-uv.md` - Complete uv field manual
+- **Git Hooks** - Automated commit workflow
+  - `pre-commit` - Runs pre-commit framework if configured
+  - `prepare-commit-msg` - LLM-generated commit messages with spinner animation
+- **Shell & Environment** - Extended bashrc, mise pnpm, starship prompt updates
+- **Omarchy** - Post-update hook for system maintenance
+- **Serena** - Migration checklist and environment variables memories
 
 ## 2026-01-09
 

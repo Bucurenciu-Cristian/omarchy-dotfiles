@@ -1,0 +1,7 @@
+#!/bin/bash
+# Tmux auto-save for cron - runs resurrect save if tmux is running
+
+# Only run if tmux server is active
+if tmux list-sessions &>/dev/null; then
+    ~/.config/tmux/plugins/tmux-resurrect/scripts/save.sh quiet
+fi

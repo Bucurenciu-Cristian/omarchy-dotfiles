@@ -1,0 +1,6 @@
+[Unit]
+Description=Tmux session auto-save via resurrect
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/tmux-auto-save

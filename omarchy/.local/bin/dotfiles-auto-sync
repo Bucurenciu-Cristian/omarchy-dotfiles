@@ -1,0 +1,99 @@
+#!/bin/bash
+# dotfiles-auto-sync - Automated dotfiles changelog, commit, and push via Claude
+# Runs daily via systemd timer
+
+set -euo pipefail
+
+DOTFILES_DIR="$HOME/dotfiles"
+LOG_FILE="$HOME/.local/share/dotfiles-sync/sync.log"
+LOCK_FILE="/tmp/dotfiles-auto-sync.lock"
+
+# Ensure log directory exists
+mkdir -p "$(dirname "$LOG_FILE")"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+notify() {
+    local urgency="${2:-normal}"
+    notify-send -u "$urgency" "Dotfiles Sync" "$1" 2>/dev/null || true
+}
+
+cleanup() {
+    rm -f "$LOCK_FILE"
+}
+trap cleanup EXIT
+
+# Prevent concurrent runs
+if [ -e "$LOCK_FILE" ]; then
+    log "ERROR: Another sync is running (lock file exists)"
+    exit 1
+fi
+touch "$LOCK_FILE"
+
+log "=== Starting dotfiles auto-sync ==="
+
+cd "$DOTFILES_DIR" || {
+    log "ERROR: Cannot cd to $DOTFILES_DIR"
+    notify "Failed: Cannot access dotfiles directory" critical
+    exit 1
+}
+
+# Check for changes (staged + unstaged + untracked)
+if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+    log "No changes detected, skipping sync"
+    exit 0
+fi
+
+log "Changes detected, invoking Claude for analysis..."
+
+# Build the prompt
+PROMPT=$(cat <<'PROMPT_EOF'
+You are syncing the dotfiles repository. Do these steps IN ORDER:
+
+1. Run `git status` and `git diff` to see all changes
+2. Analyze what changed (configs, scripts, settings, etc.)
+3. Update CHANGELOG.md:
+   - Add a new entry at the TOP (after the # Changelog header)
+   - Use format: ## YYYY-MM-DD (today's date)
+   - Use **bold category** - description format
+   - Be concise but descriptive
+   - Group related changes under categories
+4. Stage all changes: `git add -A`
+5. Commit with a conventional commit message (feat/fix/chore: description)
+6. DO NOT push - the script will handle that
+
+Important:
+- Follow the existing CHANGELOG.md style exactly
+- Only document meaningful changes, skip trivial ones
+- If only plugin/cache files changed, note that briefly
+PROMPT_EOF
+)
+
+# Run Claude headless
+if claude -p "$PROMPT" \
+    --dangerously-skip-permissions \
+    --allowedTools "Bash,Read,Edit,Write,Glob,Grep" \
+    --max-turns 15 \
+    >> "$LOG_FILE" 2>&1; then
+
+    log "Claude analysis and commit completed"
+else
+    log "ERROR: Claude failed"
+    notify "Failed: Claude analysis error - check logs" critical
+    exit 1
+fi
+
+# Push to remote
+log "Pushing to GitHub..."
+if git push >> "$LOG_FILE" 2>&1; then
+    log "Successfully pushed to GitHub"
+    notify "Dotfiles synced and pushed successfully"
+else
+    log "ERROR: Git push failed"
+    notify "Failed: Could not push to GitHub" critical
+    exit 1
+fi
+
+log "=== Sync completed successfully ==="

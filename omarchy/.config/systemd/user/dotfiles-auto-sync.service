@@ -1,0 +1,18 @@
+[Unit]
+Description=Dotfiles auto-sync via Claude (changelog, commit, push)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/dotfiles-auto-sync
+# Give Claude enough time to analyze
+TimeoutStartSec=600
+# Ensure proper environment for Claude and git
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="HOME=%h"
+# 1Password SSH agent for git push
+Environment="SSH_AUTH_SOCK=%h/.1password/agent.sock"
+
+[Install]
+WantedBy=default.target
