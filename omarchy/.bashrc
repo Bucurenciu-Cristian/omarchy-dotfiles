@@ -114,3 +114,11 @@ export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --info=inline'
 # Load fzf keybindings (Ctrl+R for history, Ctrl+T for files, Alt+C for cd)
 eval "$(fzf --bash)"
 
+
+# ============================================
+# DIRENV HOOK
+# ============================================
+eval "$(direnv hook bash)"
+
+# Git worktree with auto-envrc
+alias gwta="git-worktree-add"

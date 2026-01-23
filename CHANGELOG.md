@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-01-23
+
+- **direnv** - Add direnv integration for automatic environment loading
+  - mise config: `direnv = "latest"`
+  - bashrc: `eval "$(direnv hook bash)"`
+- **git worktree** - Streamlined worktree workflow
+  - `git wta` alias and `gwta` shell alias for `git-worktree-add`
+- **Claude Code plugins** - Enable ralph-loop and ralph-specum for spec-driven development
+
 ## 2026-01-22 (night)
 
 - **bashrc** - Add dotfiles sync aliases

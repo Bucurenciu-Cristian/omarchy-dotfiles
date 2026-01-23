@@ -5,6 +5,7 @@
 	br = branch
 	ci = commit
 	st = status
+	wta = \\!git-worktree-add
 [init]
 	defaultBranch = master
 [pull]
