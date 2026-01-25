@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-01-25
+
+- **hyprdynamicmonitors** - Add 10-bit color depth support
+  - New `bitdepth` config option for monitor profiles
+  - External template: conditional bitdepth rendering
+  - Samsung-ASUS and Samsung-iiyama profiles: hardcoded 10-bit for Samsung display
+
 ## 2026-01-23
 
 - **direnv** - Add direnv integration for automatic environment loading

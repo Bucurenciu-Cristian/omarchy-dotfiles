@@ -100,6 +100,7 @@ res = "1920x1080"
 refresh_ac = "120"
 refresh_bat = "60"
 scale = "1.0"
+bitdepth = "10"
 [[profiles.samsung.conditions.required_monitors]]
 description = "Samsung"
 match_description_using_regex = true

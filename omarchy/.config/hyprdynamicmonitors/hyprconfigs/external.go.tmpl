@@ -2,7 +2,7 @@
 # External: {{$ext.Description}}
 # Power: {{.PowerState}}
 
-monitor={{$ext.Name}},{{.res}}@{{if isOnAC}}{{.refresh_ac}}{{else}}{{.refresh_bat}}{{end}},0x0,{{.scale}}
+monitor={{$ext.Name}},{{.res}}@{{if isOnAC}}{{.refresh_ac}}{{else}}{{.refresh_bat}}{{end}},0x0,{{.scale}}{{if .bitdepth}},bitdepth,{{.bitdepth}}{{end}}
 monitor=eDP-1,disable
 
 # All workspaces on external

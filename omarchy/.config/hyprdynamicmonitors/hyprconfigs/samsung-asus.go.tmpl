@@ -6,7 +6,7 @@
 # Power: {{.PowerState}}
 
 # Samsung (left) - 1920x1080
-monitor={{$samsung.Name}},1920x1080@{{if isOnAC}}120{{else}}60{{end}},0x0,1.0
+monitor={{$samsung.Name}},1920x1080@{{if isOnAC}}120{{else}}60{{end}},0x0,1.0,bitdepth,10
 
 # ASUS (right) - 3440x1440, positioned after Samsung's width
 monitor={{$asus.Name}},3440x1440@{{if isOnAC}}100{{else}}60{{end}},1920x0,1.25
