@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-01-26
+
+- **Hyprland keybinds** - Reorganize special workspace shortcuts
+  - SUPER+E: Telegram web app (was Cursor)
+  - SUPER+I: Cursor editor (new binding)
+  - SUPER+Z: Use `zeditor` command for Zed
+  - Movies workspace: Add SHIFT modifier (SUPER+SHIFT+V)
+- **hyprdynamicmonitors** - ASUS profile scale changed to 1.0 (was 1.25)
+- **1Password** - SSH agent settings update
+  - Enable filesystem bookmark sync
+  - Set Ghostty as default terminal
+
 ## 2026-01-25
 
 - **hyprdynamicmonitors** - Add 10-bit color depth support

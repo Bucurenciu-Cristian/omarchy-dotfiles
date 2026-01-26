@@ -3,7 +3,7 @@
   "security.authenticatedUnlock.requireAccountPasswordAfter": "\"thirty-days\"",
   "appearance.interfaceDensity": "comfortable",
   "sidebar.showCategories": true,
-  "sshAgent.securityDisclosureOpen": false,
+  "sshAgent.securityDisclosureOpen": true,
   "sshAgent.storeKeyTitles": true,
   "sshAgent.storeSshKeyTitlesResponseGiven": true,
   "sshAgent.enabled": true,
@@ -12,11 +12,14 @@
   "developers.cliSharedLockState.enabled": true,
   "developers.sdkSharedLockState.enabled": true,
   "devWatchtower.localDiskScanning": true,
+  "sshAgent.syncBookmarksToFilesystem": true,
+  "developers.experience.defaultTerminalApplication": "Ghostty",
   "authTags": {
     "advanced.EnableDebuggingTools": "5diEjQ4rRLqexUD/ETsme50T4dP5KdS8qKiHOUYMFvE",
     "browsers.extension.enabled": "kOcmNnaTpOS6trx/RcYSdAtiFIqrrar9yQ98iS6bveQ",
     "devWatchtower.localDiskScanning": "B/UAFcR5TaKIfudPQ9mIOA1LO2ZoYAkn9P/keQOSF0c",
     "developers.cliSharedLockState.enabled": "A1tvqnAPWPuGBh0R4B+ZIGooxEIG0TifwuXvLE6E2+4",
+    "developers.experience.defaultTerminalApplication": "a0Gq1xTeW1sZFiDnCMpZ6Lks0gEkVqgJmW+Z9UruI70",
     "developers.experience.dismissed": "ehpFAktxK8nMJuJKmXytxpSt6jf6yCjq3X+P+F7zCGg",
     "developers.experience.enabled": "rP1E+6FauunqiNwAAzj9SN5ZrxDtZ2yG495SM3xZT3E",
     "developers.sdkSharedLockState.enabled": "UrxzqcF9njCWWhXjqzL2g25P4UXCH0TesSOx85vBlrg",
@@ -24,8 +27,9 @@
     "security.blockSleepEnabled": "y97M170wFZd8eTJZwbjTHqrscN1YMofQS1eOiSlTWq0",
     "sshAgent.commitSigningBannerDismissed": "DPaexix2GPHeHvyCKAM6XwURNlIqOZNqFcCBjnLklN4",
     "sshAgent.enabled": "JAzW66mCxRrYZ51BGNp34qoO89cyZ483FPWqcHkLwvI",
-    "sshAgent.securityDisclosureOpen": "lSH0Z16YU2Dxh0ynnvOkV1M93VnumVScdiiHFz8sPtw",
+    "sshAgent.securityDisclosureOpen": "WI2/darT6PA5QemTCsAE8gEKtN5EiFsQzveb4kqWzDw",
     "sshAgent.storeKeyTitles": "5jGlcFFI5mLSCyf3DpJdiuw79KIjsDWkw9VZ6K6wtuM",
-    "sshAgent.storeSshKeyTitlesResponseGiven": "0E72BwLHw2o4XVa8eOLos6DsMiqGPYE/AiViVHghCYE"
+    "sshAgent.storeSshKeyTitlesResponseGiven": "0E72BwLHw2o4XVa8eOLos6DsMiqGPYE/AiViVHghCYE",
+    "sshAgent.syncBookmarksToFilesystem": "iQxzFLhahzJDqkDeJUtzozGDZ5ESjWKN4PoylLJh8O8"
   }
 }

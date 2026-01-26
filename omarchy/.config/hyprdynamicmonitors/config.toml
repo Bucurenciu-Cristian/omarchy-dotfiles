@@ -73,7 +73,7 @@ config_file_type = "template"
 res = "3440x1440"
 refresh_ac = "100"
 refresh_bat = "60"
-scale = "1.25"
+scale = "1.0"
 [[profiles.asus.conditions.required_monitors]]
 description = "VG34VQ"
 match_description_using_regex = true
