@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-01-27
+
+- **hyprdynamicmonitors** - iiyama profile scale changed to 1.0 (was 1.25)
+
 ## 2026-01-26
 
 - **Hyprland keybinds** - Reorganize special workspace shortcuts
