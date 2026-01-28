@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-01-28
+
+- **tms** - Add `/home/kicky/Work/tries` search directory for project discovery
+
 ## 2026-01-27
 
 - **hyprdynamicmonitors** - iiyama profile scale changed to 1.0 (was 1.25)

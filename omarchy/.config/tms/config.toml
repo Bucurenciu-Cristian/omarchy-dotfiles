@@ -6,5 +6,9 @@ bookmarks = [
 ]
 
 [[search_dirs]]
+path = "/home/kicky/Work/tries"
+depth = 10
+
+[[search_dirs]]
 path = "/home/kicky/dev"
 depth = 10
