@@ -1,0 +1,16 @@
+#!/bin/bash
+# Sleep display with retry to handle phantom wake events
+# Usage: sleep-display
+
+# Wait for key release
+sleep 0.5
+
+# Turn off display
+hyprctl dispatch dpms off
+
+# If it wakes within 1 second, turn it off again (handles phantom input)
+sleep 1
+dpms_status=$(hyprctl monitors -j | jq -r '.[0].dpmsStatus')
+if [[ "$dpms_status" == "true" ]]; then
+    hyprctl dispatch dpms off
+fi

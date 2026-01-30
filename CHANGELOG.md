@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-01-30 (evening)
+
+- **sleep-display** - New script to turn off display without locking
+  - Handles phantom wake events with automatic retry
+  - Keybind: `SUPER+SHIFT+ALT+S`
+- **Hyprland keybinds** - Fix vim-style navigation conflict
+  - `SUPER+K` now moves focus up (was showing keybindings)
+  - `SUPER+SHIFT+ALT+K` shows keybindings (moved)
+- **tmux** - Wayland clipboard support for copy operations
+  - Switch from xclip to wl-copy for vi mode yank
+  - Mouse selection now copies to Wayland clipboard
+  - Works over SSH with explicit `WAYLAND_DISPLAY=wayland-1`
+
 ## 2026-01-30
 
 - **Triple monitor setup** - New lg-asus-iiyama profile for LG + ASUS + iiyama
