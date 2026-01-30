@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-01-30
+
+- **Triple monitor setup** - New lg-asus-iiyama profile for LG + ASUS + iiyama
+  - LG vertical (2560x1080 rotated) on left for messaging apps
+  - Stacked ultrawides on right: ASUS top, iiyama bottom
+  - Special workspaces (chat, telegram, movies) assigned to LG
+- **focus-monitor-then-run** - New helper script to focus monitor before command
+  - Ensures special workspaces open on correct monitor
+  - Graceful fallback when target monitor not connected
+  - Used by WhatsApp (Super+Shift+G) and Telegram (Super+E) keybinds
+- **project-picker** - Show workspace number in project list (`1 ● project-name`)
+- **Claude Code plugins** - Enable ralph-speckit plugin
+- **Serena memories** - Document triple monitor setup and focus-monitor helper
+
 ## 2026-01-28
 
 - **tms** - Add `/home/kicky/Work/tries` search directory for project discovery

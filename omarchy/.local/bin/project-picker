@@ -25,18 +25,21 @@ get_projects() {
 
 # Get projects with status, grouped: Active first, then Pending
 # Config format: name|session|dir|status (status defaults to "active" if missing)
+# Shows workspace number for easy window targeting
 get_projects_with_status() {
     local active=""
     local pending=""
+    local idx=0
 
     while IFS='|' read -r name session dir status; do
         [[ -z "$name" ]] && continue
+        ((idx++))
         # Default to "active" if status field is missing (backwards compat)
         [[ -z "$status" ]] && status="active"
         if [[ "$status" == "active" ]]; then
-            active+="$STATUS_ACTIVE $name"$'\n'
+            active+="$idx $STATUS_ACTIVE $name"$'\n'
         else
-            pending+="$STATUS_PENDING $name"$'\n'
+            pending+="$idx $STATUS_PENDING $name"$'\n'
         fi
     done < <(grep -v '^#' "$CONFIG_FILE" | grep -v '^$')
 
@@ -45,9 +48,14 @@ get_projects_with_status() {
     echo -n "$pending"
 }
 
-# Extract project name from status-prefixed selection
+# Extract project name from "idx status name" format
 strip_status() {
-    echo "$1" | sed 's/^[●○] //'
+    echo "$1" | sed 's/^[0-9]* [●○] //'
+}
+
+# Extract index from "idx status name" format
+get_selection_idx() {
+    echo "$1" | cut -d' ' -f1
 }
 
 # Build menu with projects + actions
@@ -267,12 +275,10 @@ main() {
             exit 0
             ;;
         *)
-            # Regular project selection - strip status prefix first
-            local project_name
-            project_name=$(strip_status "$selected")
+            # Regular project selection - get index directly from selection
             local idx
-            idx=$(get_projects | grep -n "^${project_name}$" | cut -d: -f1)
-            if [[ -n "$idx" ]]; then
+            idx=$(get_selection_idx "$selected")
+            if [[ -n "$idx" && "$idx" =~ ^[0-9]+$ ]]; then
                 $HOME/.local/bin/project-scratchpad-select "$idx"
             fi
             ;;

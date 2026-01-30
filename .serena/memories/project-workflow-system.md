@@ -74,10 +74,13 @@ Opens terminal attached to current project's tmux session:
 Location: `~/.local/bin/project-picker`
 
 Walker-based CRUD interface:
-- List and switch projects
+- List and switch projects (shows workspace number: `1 ● dotfiles`)
 - **➕ New project** - browse directories with walker, auto-suggest name
+- **🔄 Toggle status** - switch between active/pending
 - **🗑️ Delete project** - with confirmation
 - **✏️ Edit config** - open in editor
+
+Display format: `N ● project-name` where N is the workspace number shown in waybar.
 
 New project flow:
 1. Browse directories (fd + walker fuzzy search)

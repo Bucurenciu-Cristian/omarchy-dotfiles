@@ -136,7 +136,8 @@
     "changelog-generator@awesome-claude-skills": true,
     "superpowers@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
-    "ralph-specum@smart-ralph": true
+    "ralph-specum@smart-ralph": true,
+    "ralph-speckit@smart-ralph": true
   },
   "extraKnownMarketplaces": {
     "superpowers-dev": {

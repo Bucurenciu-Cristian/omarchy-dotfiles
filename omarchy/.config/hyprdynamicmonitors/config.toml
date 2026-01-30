@@ -14,6 +14,23 @@ config_file_type = "static"
 
 # External monitor profiles (checked first - higher priority)
 
+# Triple external: LG + ASUS + iiyama (vertical LG on left, stacked ultrawides right)
+[profiles.lg-asus-iiyama]
+config_file = "hyprconfigs/lg-asus-iiyama.go.tmpl"
+config_file_type = "template"
+[[profiles.lg-asus-iiyama.conditions.required_monitors]]
+description = "LG|RGT"
+match_description_using_regex = true
+monitor_tag = "lg"
+[[profiles.lg-asus-iiyama.conditions.required_monitors]]
+description = "VG34VQ"
+match_description_using_regex = true
+monitor_tag = "asus"
+[[profiles.lg-asus-iiyama.conditions.required_monitors]]
+description = "PL3481WQ"
+match_description_using_regex = true
+monitor_tag = "iiyama"
+
 # Dual external: Samsung + ASUS (must be before individual profiles)
 [profiles.samsung-asus]
 config_file = "hyprconfigs/samsung-asus.go.tmpl"

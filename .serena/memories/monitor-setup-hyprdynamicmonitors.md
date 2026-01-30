@@ -35,12 +35,50 @@ Output is written to: `~/.config/hypr/monitors.conf` (sourced by Hyprland)
 
 | Profile | Condition | Use Case |
 |---------|-----------|----------|
+| lg-asus-iiyama | LG\|RGT + VG34VQ + PL3481WQ | Triple: LG vertical left, stacked ultrawides right |
 | samsung-asus | Samsung + VG34VQ | Dual external: Samsung left, ASUS right |
+| asus-iiyama | VG34VQ + PL3481WQ | Dual external: ASUS top, iiyama below |
+| samsung-iiyama | Samsung + PL3481WQ | Dual external |
 | iiyama | PL3481WQ | Single ultrawide |
 | asus | VG34VQ | Single ultrawide |
 | arzopa | ARZOPA | Portable monitor |
 | samsung | Samsung | Single Samsung |
 | laptop | (fallback) | No external connected |
+
+**Note:** LG monitor may report as "RGT 0x5211" due to EDID quirks - regex `LG|RGT` handles both.
+
+## Triple Monitor Setup (lg-asus-iiyama)
+
+Layout:
+```
+┌─────────┐ ┌─────────────────────────────────┐
+│         │ │           ASUS                  │
+│   LG    │ │       3440x1440 @ 100Hz         │
+│  1080x  │ │       workspaces 1-5            │
+│  2560   │ ├─────────────────────────────────┤
+│ rotated │ │          iiyama                 │
+│  90°    │ │       3440x1440 @ 180Hz         │
+│         │ │       workspaces 6-10           │
+│ special │ │                                 │
+│ :chat   │ └─────────────────────────────────┘
+│:telegram│
+│ :movies │
+└─────────┘
+```
+
+- LG: 2560x1080 rotated (transform 1), position 0x0
+- ASUS: 3440x1440, scale 1.25, position 1080x128 (centered with stacked height)
+- iiyama: 3440x1440 @ 180Hz, scale 1.25, position 1080x1280
+- Laptop: disabled
+- Special workspaces on LG: `movies`, `chat` (WhatsApp), `telegram`
+
+### Messaging Apps on LG
+
+Keybindings use `focus-monitor-then-run` wrapper to focus LG before opening:
+- `Super+Shift+G`: WhatsApp (special:chat)
+- `Super+E`: Telegram (special:telegram)
+
+The wrapper (`~/.local/bin/focus-monitor-then-run`) finds monitor by description pattern ("LG") and focuses it before running command. Falls back gracefully when LG not connected.
 
 ## Dual Monitor Setup (samsung-asus)
 

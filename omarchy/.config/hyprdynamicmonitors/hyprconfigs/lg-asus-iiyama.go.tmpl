@@ -1,0 +1,29 @@
+{{- $lg := index .MonitorsByTag "lg" -}}
+{{- $asus := index .MonitorsByTag "asus" -}}
+{{- $iiyama := index .MonitorsByTag "iiyama" -}}
+# Triple External: LG (left, vertical) + ASUS (top right) + iiyama (bottom right)
+# LG: {{$lg.Description}} via {{$lg.Name}}
+# ASUS: {{$asus.Description}} via {{$asus.Name}}
+# iiyama: {{$iiyama.Description}} via {{$iiyama.Name}}
+# Power: {{.PowerState}}
+
+# LG (left, vertical) - 2560x1080 rotated 90°, logical 1080x2560
+monitor={{$lg.Name}},2560x1080@60,0x0,1.0,transform,1
+
+# ASUS (top right) - 3440x1440 at 100Hz, 125% scale
+# Position: 1080x128 (after LG width, vertically centered with stacked ultrawides)
+# Offset 128 = (LG height 2560 - stacked height 2304) / 2
+monitor={{$asus.Name}},3440x1440@{{if isOnAC}}100{{else}}60{{end}},1080x128,1.25
+
+# iiyama (bottom right) - 3440x1440 at 180Hz, 125% scale
+# Position: 1080x1280 (after LG width, below ASUS: 128 + 1152)
+monitor={{$iiyama.Name}},3440x1440@{{if isOnAC}}179.98{{else}}60{{end}},1080x1280,1.25
+
+# Laptop disabled
+monitor=eDP-1,disable
+
+# Special workspaces on LG (messaging/media apps)
+workspace = special:movies,monitor:{{$lg.Name}}
+workspace = special:chat,monitor:{{$lg.Name}}
+workspace = special:telegram,monitor:{{$lg.Name}}
+
